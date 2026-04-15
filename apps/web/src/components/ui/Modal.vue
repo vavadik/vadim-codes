@@ -25,7 +25,8 @@ watch(
   (val) => {
     if (val) dialogRef.value?.showModal();
     else dialogRef.value?.close();
-  }
+  },
+  { immediate: true }
 );
 
 function onBackdropClick(e: MouseEvent) {

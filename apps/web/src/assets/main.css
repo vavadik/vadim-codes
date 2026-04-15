@@ -79,6 +79,8 @@
 }
 
 @theme inline {
+  --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+
   /* Brand */
   --color-primary: var(--theme-main);
   --color-primary-hover: var(--theme-main-hover);

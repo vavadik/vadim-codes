@@ -1,12 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-200">
-    <Navbar>
-      <template #brand>
-        <span class="text-xl font-bold">Design System</span>
-      </template>
-      <a href="/" class="link link-hover text-sm">← Home</a>
-    </Navbar>
-
+  <AppLayout>
     <div class="max-w-4xl mx-auto px-6 py-12 flex flex-col gap-10">
       <!-- Buttons -->
       <Card>
@@ -146,25 +139,71 @@
           </div>
         </div>
       </Card>
+
+      <!-- Popups -->
+      <Card>
+        <template #header>Popups</template>
+        <div class="flex flex-col gap-4">
+          <p class="text-sm text-base-content/60">
+            Call and await any popup from anywhere in the app via
+            <code class="bg-base-200 px-1 rounded text-xs">usePopup()</code>. Resolves with the
+            popup's return value; backdrop click resolves
+            <code class="bg-base-200 px-1 rounded text-xs">undefined</code>.
+          </p>
+          <Divider>ConfirmPopup</Divider>
+          <div class="flex flex-wrap items-center gap-3">
+            <Button @click="openConfirm">Open confirm</Button>
+            <span v-if="confirmResult !== null" class="text-sm text-base-content/60">
+              Resolved:
+              <code class="bg-base-200 px-1 rounded text-xs">{{ String(confirmResult) }}</code>
+            </span>
+          </div>
+          <Divider>Custom popup</Divider>
+          <div class="flex flex-wrap items-center gap-3">
+            <Button variant="secondary" @click="openCustom">Open custom</Button>
+            <span v-if="customResult !== null" class="text-sm text-base-content/60">
+              Resolved:
+              <code class="bg-base-200 px-1 rounded text-xs">{{ String(customResult) }}</code>
+            </span>
+          </div>
+        </div>
+      </Card>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Divider,
-  Input,
-  Loading,
-  Modal,
-  Navbar,
-} from '@/components/ui';
+import { Alert, Badge, Button, Card, Divider, Input, Loading, Modal } from '@/components/ui';
+import AppLayout from '@/components/layouts/AppLayout.vue';
+import { usePopup } from '@/composables/usePopup';
+import ConfirmPopup from '@/components/popup/ConfirmPopup.vue';
+import CustomPopup from '@/components/popup/CustomPopup.vue';
 
 const modalOpen = ref(false);
 const inputValue = ref('');
 const errorInputValue = ref('');
+
+const { open } = usePopup();
+
+const confirmResult = ref<boolean | undefined | null>(null);
+
+async function openConfirm() {
+  confirmResult.value = null;
+  confirmResult.value = await open<boolean>(ConfirmPopup, {
+    title: 'Delete item',
+    message: 'Are you sure you want to delete this item? This action cannot be undone.',
+    confirmLabel: 'Delete',
+  });
+}
+
+const customResult = ref<string | undefined | null>(null);
+
+async function openCustom() {
+  customResult.value = null;
+  customResult.value = await open<string>(CustomPopup, {
+    title: 'Rename',
+    initialValue: 'My document',
+  });
+}
 </script>
