@@ -11,6 +11,10 @@ const router = createRouter({
       path: '/design-system',
       component: () => import('@/pages/DesignSystemPage.vue'),
     },
+    {
+      path: '/editor',
+      component: () => import('@/pages/EditorPage.vue'),
+    },
   ],
 });
 

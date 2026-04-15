@@ -147,4 +147,49 @@ Need a new UI element?
 
 ## Styling
 
-Prefer utility classes from the project's Tailwind setup over custom CSS. Add `<style scoped>` only when a utility-class approach would be genuinely awkward (e.g. complex animations, pseudo-element tricks). Avoid global styles in component files.
+Use `<style scoped lang="scss">` for all component styles. Never use plain `<style scoped>` (no `lang`).
+
+Write styles with **BEM** (Block Element Modifier):
+
+```scss
+// Block
+.card { ... }
+
+// Element  — double underscore
+.card__title { ... }
+.card__body { ... }
+
+// Modifier — double hyphen, always on the block or element it modifies
+.card--featured { ... }
+.card__title--large { ... }
+```
+
+Nest elements and modifiers inside the block using SCSS `&`:
+
+```vue
+<style scoped lang="scss">
+.card {
+  padding: 1rem;
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__body {
+    margin-top: 0.5rem;
+  }
+
+  &--featured {
+    border: 2px solid var(--color-primary);
+  }
+}
+</style>
+```
+
+Rules:
+
+- **One block per component** — the block name matches the component's root element class.
+- BEM classes only. Do not mix Tailwind utilities and BEM in the same element — pick one per component. Tailwind utilities are for quick layout primitives in page-level wrappers; BEM SCSS is for anything with meaningful component-specific style.
+- Use CSS custom properties (`var(--color-primary)` etc.) from the design system for colours — no hardcoded hex values.
+- Only add `<style scoped lang="scss">` if styles are actually needed. Don't add an empty block.
+- Avoid global styles in component files.
