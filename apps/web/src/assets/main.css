@@ -1,0 +1,119 @@
+@import 'tailwindcss';
+@plugin 'daisyui';
+@plugin 'daisyui/theme' {
+  name: 'composer';
+  default: true;
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97% 0.002 270);
+  --color-base-300: oklch(95% 0.015 240);
+  --color-base-content: oklch(21% 0.005 265);
+
+  /* Brand — mapped from --theme-main / --theme-secondary */
+  --color-primary: oklch(62% 0.19 215);
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: oklch(79% 0.15 55);
+  --color-secondary-content: oklch(21% 0.005 265);
+
+  /* Accent — AI purple (--ai-color) */
+  --color-accent: oklch(52% 0.17 290);
+  --color-accent-content: oklch(100% 0 0);
+
+  /* Neutral */
+  --color-neutral: oklch(48% 0.007 255);
+  --color-neutral-content: oklch(100% 0 0);
+
+  /* Semantic */
+  --color-info: oklch(62% 0.19 215);
+  --color-info-content: oklch(100% 0 0);
+  --color-success: oklch(76% 0.19 155);
+  --color-success-content: oklch(100% 0 0);
+  --color-warning: oklch(79% 0.15 55);
+  --color-warning-content: oklch(21% 0.005 265);
+  --color-error: oklch(50% 0.26 30);
+  --color-error-content: oklch(100% 0 0);
+
+  /* Shape */
+  --radius-selector: 0.5rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+:root {
+  --background-primary: #f6f6f7;
+  --background-secondary: #ebf1f9;
+  --background-table-row: #f7f9fd;
+  --background-editor-field-highlight: #3b97e3;
+  --background-white: #fff;
+  --background-editor-layer: #eceff4;
+  --fonts-regular-text: #2f3135;
+  --fonts-secondary-text: #6b7078;
+  --fonts-white-text: #fff;
+  --fonts-icon: #858d9d;
+  --fonts-icon-hover: #6a7385;
+  --fonts-placeholder: #707889;
+  --semantic-error: #ed0a0a;
+  --semantic-success: #01cd74;
+  --semantic-warning: #ffac69;
+  --theme-main: #0c9ced;
+  --theme-main-hover: #068bd6;
+  --theme-secondary: #ffac69;
+  --theme-secondary-hover: #ff821c;
+  --forms-border: #dadce1;
+  --forms-border-tooltip: #bfd3ec;
+  --forms-field-white: #fff;
+  --info-background: #eaf4fd;
+  --info-color: #0c9ced;
+  --warning-color: #ffac69;
+  --warning-background: rgba(255, 172, 105, 0.15);
+  --error-color: #ed0a0a;
+  --error-background: rgba(237, 10, 10, 0.19);
+  --ai-color: #8d5fc8;
+  --ai-color-hover: #baa9d1;
+  --ai-success-color: #1aa566;
+}
+
+@theme inline {
+  /* Brand */
+  --color-primary: var(--theme-main);
+  --color-primary-hover: var(--theme-main-hover);
+  --color-secondary: var(--theme-secondary);
+  --color-secondary-hover: var(--theme-secondary-hover);
+
+  /* AI */
+  --color-ai: var(--ai-color);
+  --color-ai-hover: var(--ai-color-hover);
+  --color-ai-success: var(--ai-success-color);
+
+  /* Semantic */
+  --color-error: var(--semantic-error);
+  --color-error-bg: var(--error-background);
+  --color-success: var(--semantic-success);
+  --color-warning: var(--semantic-warning);
+  --color-warning-bg: var(--warning-background);
+  --color-info: var(--info-color);
+  --color-info-bg: var(--info-background);
+
+  /* Text */
+  --color-text-base: var(--fonts-regular-text);
+  --color-text-muted: var(--fonts-secondary-text);
+  --color-icon: var(--fonts-icon);
+  --color-icon-hover: var(--fonts-icon-hover);
+  --color-placeholder: var(--fonts-placeholder);
+
+  /* Surfaces */
+  --color-surface: var(--background-primary);
+  --color-surface-secondary: var(--background-secondary);
+  --color-surface-table-row: var(--background-table-row);
+  --color-surface-editor: var(--background-editor-layer);
+  --color-surface-highlight: var(--background-editor-field-highlight);
+
+  /* Borders */
+  --color-border: var(--forms-border);
+  --color-border-tooltip: var(--forms-border-tooltip);
+}
