@@ -16,7 +16,7 @@ export class SalesforceStrategy extends PassportStrategy(Strategy, 'salesforce')
       clientID: config.getOrThrow<string>('SF_CLIENT_ID'),
       clientSecret: config.getOrThrow<string>('SF_CLIENT_SECRET'),
       callbackURL: config.getOrThrow<string>('SF_CALLBACK_URL'),
-      scope: ['openid', 'profile', 'email'],
+      scope: ['openid', 'profile', 'email', 'api'],
     });
     this.instanceUrl = instanceUrl;
   }
@@ -40,12 +40,18 @@ export class SalesforceStrategy extends PassportStrategy(Strategy, 'salesforce')
       user_id: string;
       organization_id: string;
       email: string;
+      urls: Record<string, string>;
     };
+
+    // Derive the org's instance URL from the urls map (e.g. "https://na1.salesforce.com")
+    const sfInstanceUrl = new URL(userinfo.urls['rest'] ?? userinfo.urls['enterprise']).origin;
 
     done(null, {
       sfUserId: userinfo.user_id,
       sfOrgId: userinfo.organization_id,
       email: userinfo.email,
+      sfAccessToken: accessToken,
+      sfInstanceUrl,
     });
   }
 }

@@ -25,8 +25,10 @@ model Session {
   sfUserId    String
   sfOrgId     String
   email       String
-  hashedToken String   @unique
-  expiresAt   DateTime
+  hashedToken   String   @unique
+  sfAccessToken String
+  sfInstanceUrl String
+  expiresAt     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

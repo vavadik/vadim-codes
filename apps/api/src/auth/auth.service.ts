@@ -28,6 +28,8 @@ export class AuthService {
         sfOrgId: sfUser.sfOrgId,
         email: sfUser.email,
         hashedToken,
+        sfAccessToken: sfUser.sfAccessToken,
+        sfInstanceUrl: sfUser.sfInstanceUrl,
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
       },
     });
@@ -70,7 +72,11 @@ export class AuthService {
     await this.prisma.db.session.deleteMany({ where: { sfUserId } });
   }
 
-  private generateTokens(sfUser: SfUser): { jwt: string; rawToken: string; hashedToken: string } {
+  private generateTokens(sfUser: Pick<SfUser, 'sfUserId' | 'sfOrgId' | 'email'>): {
+    jwt: string;
+    rawToken: string;
+    hashedToken: string;
+  } {
     const payload: JwtPayload = {
       sub: sfUser.sfUserId,
       org: sfUser.sfOrgId,

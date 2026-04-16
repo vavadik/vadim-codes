@@ -8,4 +8,15 @@ export {
   type CreateTodoDto,
   type UpdateTodoDto,
 } from './dtos/todo.dto';
+export {
+  sfDescribeGlobalSchema,
+  sfSObjectDescribeSchema,
+  sfSObjectSummarySchema,
+  sfFieldSchema,
+  type SfDescribeGlobal,
+  type SfSObjectDescribe,
+  type SfSObjectSummary,
+  type SfField,
+  type SfRecord,
+} from './dtos/salesforce.dto';
 export { generateOpenApiDocument } from './openapi';

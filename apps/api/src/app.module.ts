@@ -6,6 +6,7 @@ import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { TodoModule } from './todo/todo.module';
 import { AuthModule } from './auth/auth.module';
+import { SalesforceModule } from './salesforce/salesforce.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     TodoModule,
     AuthModule,
+    SalesforceModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

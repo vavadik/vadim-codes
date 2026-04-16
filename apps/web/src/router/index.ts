@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('@/pages/TodoPage.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/salesforce',
+      component: () => import('@/pages/SalesforcePage.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 

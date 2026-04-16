@@ -6,9 +6,11 @@ export default defineConfig({
   oxc: false,
   test: {
     globals: true,
-    root: './test',
+    include: ['test/**/*.test.ts'],
     coverage: {
-      provider: 'v8', // or 'istanbul'
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      exclude: ['src/main.ts', 'src/**/*.module.ts', 'src/**/*.d.ts'],
     },
   },
   plugins: [
