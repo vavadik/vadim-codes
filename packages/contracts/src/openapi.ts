@@ -17,6 +17,6 @@ export async function generateOpenApiDocument() {
   return generateOpenApi(
     contract,
     { info: { title: 'Composer AI API', version: '1.0.0' } },
-    { schemaTransformer: ZOD_4_ASYNC },
+    { schemaTransformer: ZOD_4_ASYNC }
   );
 }
