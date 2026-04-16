@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-viewport" @click.self="store.deselectAll()" @wheel.prevent="onWheel">
+  <div class="canvas-viewport" @click.self="store.deselectAll()" @wheel="onWheel">
     <div class="canvas-scroller">
       <CanvasPage />
     </div>
@@ -20,6 +20,7 @@ const store = useEditorStore();
 
 function onWheel(e: WheelEvent) {
   if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
     store.setZoom(store.zoom + delta);
   }
@@ -31,19 +32,23 @@ function onWheel(e: WheelEvent) {
   position: relative;
   flex: 1;
   overflow: auto;
-  background: var(--color-base-200);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  background-color: var(--color-base-200);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--color-base-content) 20%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
 }
 
 .canvas-scroller {
   padding: 2rem;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   min-width: 100%;
   min-height: 100%;
+  box-sizing: border-box;
 }
 
 .canvas-zoom-controls {

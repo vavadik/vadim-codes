@@ -33,6 +33,9 @@ export interface BaseNode {
   height: number;
   rotate?: number;
   opacity?: number;
+  // Flex child properties — only meaningful when parentId !== null
+  flexGrow?: number; // 0 = don't grow (default), >0 = proportion of remaining space to claim
+  flexShrink?: number; // 1 = shrink proportionally (default), 0 = don't shrink
 }
 
 export interface TextNode extends BaseNode {

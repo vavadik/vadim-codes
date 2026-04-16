@@ -12,7 +12,22 @@
       </div>
     </template>
     <div v-else class="properties-panel__empty">
-      <p>Select an element</p>
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        class="properties-panel__empty-icon"
+      >
+        <path
+          d="M4 4l5 12 2.5-5L17 8.5 5 3z"
+          stroke="currentColor"
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span class="properties-panel__empty-primary">Select an element</span>
+      <span class="properties-panel__empty-secondary">to edit its properties</span>
     </div>
   </aside>
 </template>
@@ -32,8 +47,8 @@ const node = computed(() => store.selectedNode);
 
 <style scoped lang="scss">
 .properties-panel {
-  width: 240px;
   flex-shrink: 0;
+  min-width: 140px;
   border-left: 1px solid var(--color-base-300);
   background: var(--color-base-100);
   display: flex;
@@ -66,11 +81,25 @@ const node = computed(() => store.selectedNode);
   &__empty {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 0.82rem;
+    gap: 4px;
     color: var(--color-base-content);
     opacity: 0.4;
+  }
+
+  &__empty-icon {
+    margin-bottom: 4px;
+  }
+
+  &__empty-primary {
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  &__empty-secondary {
+    font-size: 0.75rem;
   }
 }
 </style>

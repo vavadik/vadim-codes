@@ -73,7 +73,7 @@ function onHeadInput(e: Event) {
   color: var(--color-base-content);
 
   &:focus {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-accent);
     outline-offset: -1px;
   }
 }

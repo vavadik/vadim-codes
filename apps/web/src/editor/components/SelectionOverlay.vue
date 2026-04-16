@@ -50,7 +50,9 @@ const handles = computed(() => {
 
 function startResize(cursor: string, e: MouseEvent) {
   const node = store.getNode(props.nodeId);
-  if (!node) return;
+  if (!node) {
+    return;
+  }
 
   const startX = e.clientX;
   const startY = e.clientY;
@@ -67,8 +69,12 @@ function startResize(cursor: string, e: MouseEvent) {
     let newX = startNodeX;
     let newY = startNodeY;
 
-    if (cursor.includes('e')) newW = Math.max(10, startW + dxMm);
-    if (cursor.includes('s')) newH = Math.max(5, startH + dyMm);
+    if (cursor.includes('e')) {
+      newW = Math.max(10, startW + dxMm);
+    }
+    if (cursor.includes('s')) {
+      newH = Math.max(5, startH + dyMm);
+    }
     if (cursor.includes('w')) {
       newW = Math.max(10, startW - dxMm);
       newX = startNodeX + (startW - newW);
@@ -100,8 +106,8 @@ function startResize(cursor: string, e: MouseEvent) {
 
 .selection-handle {
   position: absolute;
-  background: #fff;
-  border: 2px solid #6366f1;
+  background: var(--color-canvas-handle-bg);
+  border: 2px solid var(--color-canvas-selection);
   border-radius: 2px;
   pointer-events: all;
   z-index: 10;

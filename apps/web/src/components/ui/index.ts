@@ -6,3 +6,4 @@ export { default as Input } from './Input.vue';
 export { default as Modal } from './Modal.vue';
 export { default as Divider } from './Divider.vue';
 export { default as Loading } from './Loading.vue';
+export { default as Tooltip } from './Tooltip.vue';

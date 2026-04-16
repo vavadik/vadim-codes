@@ -36,7 +36,9 @@ const rows = computed<string[][]>(() => {
 
 function colWidth(i: number): string {
   const pcts = node.value.headWidthPercentages;
-  if (!pcts || i >= pcts.length) return 'auto';
+  if (!pcts || i >= pcts.length) {
+    return 'auto';
+  }
   return `${pcts[i]}%`;
 }
 </script>

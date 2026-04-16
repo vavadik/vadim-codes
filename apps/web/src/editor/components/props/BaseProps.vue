@@ -37,6 +37,30 @@
         </div>
       </div>
       <p class="prop-hint">Position controlled by flex container</p>
+      <div class="prop-row">
+        <div class="prop-field">
+          <label class="prop-label">Flex Grow</label>
+          <input
+            class="prop-input"
+            type="number"
+            min="0"
+            step="1"
+            :value="node.flexGrow ?? 0"
+            @input="updateNum('flexGrow', $event)"
+          />
+        </div>
+        <div class="prop-field">
+          <label class="prop-label">Flex Shrink</label>
+          <input
+            class="prop-input"
+            type="number"
+            min="0"
+            step="1"
+            :value="node.flexShrink ?? 1"
+            @input="updateNum('flexShrink', $event)"
+          />
+        </div>
+      </div>
     </template>
 
     <div class="prop-row">
@@ -109,7 +133,9 @@ function update(key: string, e: Event) {
 
 function updateNum(key: string, e: Event) {
   const val = parseFloat((e.target as HTMLInputElement).value);
-  if (!isNaN(val)) store.updateNode(props.nodeId, { [key]: val } as Partial<EditorNode>);
+  if (!isNaN(val)) {
+    store.updateNode(props.nodeId, { [key]: val } as Partial<EditorNode>);
+  }
 }
 </script>
 
@@ -147,7 +173,7 @@ function updateNum(key: string, e: Event) {
   }
 
   &:focus {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-accent);
     outline-offset: -1px;
   }
 }
@@ -174,15 +200,15 @@ function updateNum(key: string, e: Event) {
 .prop-delete-btn {
   margin-top: 4px;
   padding: 6px;
-  border: 1px solid #ef4444;
+  border: 1px solid var(--color-error);
   border-radius: 6px;
   background: transparent;
-  color: #ef4444;
+  color: var(--color-error);
   font-size: 0.8rem;
   cursor: pointer;
 
   &:hover {
-    background: #fef2f2;
+    background: var(--color-error-subtle);
   }
 }
 </style>

@@ -94,7 +94,9 @@ function update(key: string, e: Event) {
 
 function updateNum(key: string, e: Event) {
   const val = parseFloat((e.target as HTMLInputElement).value);
-  if (!isNaN(val)) store.updateNode(props.nodeId, { [key]: val } as Partial<TextNode>);
+  if (!isNaN(val)) {
+    store.updateNode(props.nodeId, { [key]: val } as Partial<TextNode>);
+  }
 }
 </script>
 
@@ -137,7 +139,7 @@ function updateNum(key: string, e: Event) {
   color: var(--color-base-content);
 
   &:focus {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-accent);
     outline-offset: -1px;
   }
 }

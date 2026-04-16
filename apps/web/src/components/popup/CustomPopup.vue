@@ -26,6 +26,8 @@ const props = defineProps<{
 const value = ref(props.initialValue ?? '');
 
 function submit() {
-  if (value.value.trim()) props.resolve(value.value.trim());
+  if (value.value.trim()) {
+    props.resolve(value.value.trim());
+  }
 }
 </script>

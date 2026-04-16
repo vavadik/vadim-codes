@@ -19,7 +19,9 @@ const { toPx } = useCanvasScale();
 const node = computed(() => (drag.nodeId ? store.getNode(drag.nodeId) : null));
 
 const ghostStyle = computed(() => {
-  if (!node.value) return {};
+  if (!node.value) {
+    return {};
+  }
   return {
     position: 'fixed' as const,
     left: `${drag.ghostX}px`,
@@ -29,8 +31,8 @@ const ghostStyle = computed(() => {
     pointerEvents: 'none' as const,
     opacity: 0.5,
     zIndex: 9999,
-    background: '#6366f1',
-    border: '2px solid #4f46e5',
+    background: 'var(--color-accent)',
+    border: '2px solid var(--color-accent-hover)',
     borderRadius: '2px',
     display: 'flex',
     alignItems: 'center',
@@ -43,7 +45,7 @@ const ghostStyle = computed(() => {
 .drag-ghost {
   &__label {
     font-size: 0.7rem;
-    color: #fff;
+    color: var(--color-accent-content);
     text-transform: capitalize;
     user-select: none;
   }

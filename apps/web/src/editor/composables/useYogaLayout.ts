@@ -53,7 +53,9 @@ let yoga: Awaited<typeof import('yoga-layout')> | null = null;
 const yogaReady = ref(false);
 
 async function initYoga(): Promise<void> {
-  if (yoga) return;
+  if (yoga) {
+    return;
+  }
   yoga = await import('yoga-layout');
   yogaReady.value = true;
 }
@@ -62,9 +64,11 @@ async function initYoga(): Promise<void> {
 
 function calculateContainerLayout(
   container: ContainerNode,
-  children: { id: string; width: number; height: number }[]
+  children: { id: string; width: number; height: number; flexGrow?: number; flexShrink?: number }[]
 ): { id: string; x: number; y: number; width: number; height: number }[] {
-  if (!yoga) return [];
+  if (!yoga) {
+    return [];
+  }
 
   const { Node } = yoga.default;
 
@@ -81,10 +85,39 @@ function calculateContainerLayout(
   root.setPadding(Edge.Bottom, container.paddingBottom);
   root.setPadding(Edge.Left, container.paddingLeft);
 
+  const isRow = container.flexDirection === 'row' || container.flexDirection === 'row-reverse';
+  const stretches = container.alignItems === 'stretch';
+
   const yogaChildren: YogaNode[] = children.map((child, i) => {
     const yc = Node.create();
-    yc.setWidth(child.width);
-    yc.setHeight(child.height);
+    const grows = (child.flexGrow ?? 0) > 0;
+
+    if (grows) {
+      // flex-basis: 0 so flex-grow controls the full proportion of space, not just the remainder.
+      yc.setFlexBasis(0);
+      yc.setFlexGrow(child.flexGrow!);
+    } else {
+      // Set main-axis size from the stored value.
+      if (isRow) {
+        yc.setWidth(child.width);
+      } else {
+        yc.setHeight(child.height);
+      }
+    }
+
+    // Cross-axis: only set when NOT stretching — stretch requires leaving it unset so Yoga
+    // can fill the container's cross-axis dimension.
+    if (!stretches) {
+      if (isRow) {
+        yc.setHeight(child.height);
+      } else {
+        yc.setWidth(child.width);
+      }
+    }
+
+    if (child.flexShrink !== undefined) {
+      yc.setFlexShrink(child.flexShrink);
+    }
     root.insertChild(yc, i);
     return yc;
   });
@@ -119,7 +152,9 @@ function calculateContainerLayout(
  */
 function recalculateAll(): void {
   const store = useEditorStore();
-  if (!yoga) return;
+  if (!yoga) {
+    return;
+  }
 
   const allResults: { id: string; x: number; y: number; width: number; height: number }[] = [];
 
@@ -127,13 +162,17 @@ function recalculateAll(): void {
   while (queue.length > 0) {
     const id = queue.shift()!;
     const node = store.getNode(id);
-    if (!node || node.kind !== 'container') continue;
+    if (!node || node.kind !== 'container') {
+      continue;
+    }
 
     const container = node as ContainerNode;
     const children = store.getChildren(container.id).map((c) => ({
       id: c.id,
       width: c.width,
       height: c.height,
+      flexGrow: c.flexGrow,
+      flexShrink: c.flexShrink,
     }));
 
     const results = calculateContainerLayout(container, children);
@@ -142,7 +181,9 @@ function recalculateAll(): void {
     // Queue child containers to process after their parent
     for (const childId of container.childIds) {
       const child = store.getNode(childId);
-      if (child?.kind === 'container') queue.push(childId);
+      if (child?.kind === 'container') {
+        queue.push(childId);
+      }
     }
   }
 

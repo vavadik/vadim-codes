@@ -169,7 +169,9 @@ function updateFlex(key: string, value: string) {
 
 function updateFlexNum(key: string, e: Event) {
   const val = parseFloat((e.target as HTMLInputElement).value);
-  if (!isNaN(val)) store.updateFlex(props.nodeId, { [key]: val } as Partial<ContainerNode>);
+  if (!isNaN(val)) {
+    store.updateFlex(props.nodeId, { [key]: val } as Partial<ContainerNode>);
+  }
 }
 </script>
 
@@ -212,7 +214,7 @@ function updateFlexNum(key: string, e: Event) {
   color: var(--color-base-content);
 
   &:focus {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-accent);
     outline-offset: -1px;
   }
 }
@@ -254,9 +256,9 @@ function updateFlexNum(key: string, e: Event) {
   }
 
   &--active {
-    background: #6366f1;
-    color: #fff;
-    border-color: #6366f1;
+    background: var(--color-accent);
+    color: var(--color-accent-content);
+    border-color: var(--color-accent);
   }
 
   &--small {

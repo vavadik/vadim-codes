@@ -4,6 +4,7 @@
     :class="{
       'canvas-node--selected': isSelected,
       'canvas-node--outlined': store.showOutlines && !isSelected,
+      'canvas-node--dragging': drag.active && drag.nodeId === nodeId,
     }"
     :style="nodeStyle"
     @mousedown.stop="onMouseDown"
@@ -31,7 +32,7 @@ const componentMap: Record<NodeKind, ReturnType<typeof defineAsyncComponent>> = 
 
 const props = defineProps<{ nodeId: string }>();
 const store = useEditorStore();
-const { startNodeDrag } = useDragDrop();
+const { startNodeDrag, drag } = useDragDrop();
 const { toPx } = useCanvasScale();
 
 const node = computed(() => store.getNode(props.nodeId));
@@ -40,7 +41,9 @@ const childComponent = computed(() => (node.value ? componentMap[node.value.kind
 
 const nodeStyle = computed(() => {
   const n = node.value;
-  if (!n) return {};
+  if (!n) {
+    return {};
+  }
   return {
     position: 'absolute' as const,
     left: `${toPx(n.x)}px`,
@@ -49,12 +52,14 @@ const nodeStyle = computed(() => {
     height: `${toPx(n.height)}px`,
     transform: n.rotate ? `rotate(${n.rotate}deg)` : undefined,
     opacity: n.opacity !== undefined ? n.opacity : undefined,
-    cursor: n.parentId === null ? 'move' : 'default',
+    cursor: n.parentId === null ? 'move' : 'grab',
   };
 });
 
 function onMouseDown(e: MouseEvent) {
-  if (e.button !== 0) return;
+  if (e.button !== 0) {
+    return;
+  }
   store.selectNode(props.nodeId);
   startNodeDrag(props.nodeId, e, e.currentTarget as HTMLElement);
 }
@@ -65,13 +70,17 @@ function onMouseDown(e: MouseEvent) {
   box-sizing: border-box;
 
   &--selected {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-canvas-selection);
     outline-offset: 1px;
   }
 
   &--outlined {
-    outline: 1px dotted #94a3b8;
+    outline: 1px dotted rgba(0, 0, 0, 0.3);
     outline-offset: 1px;
+  }
+
+  &--dragging {
+    opacity: 0.3;
   }
 }
 </style>

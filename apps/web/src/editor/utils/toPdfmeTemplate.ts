@@ -13,10 +13,14 @@ function getAbsolutePos(
   node: EditorNode,
   nodesMap: Map<string, EditorNode>
 ): { x: number; y: number } {
-  if (node.parentId === null) return { x: node.x, y: node.y };
+  if (node.parentId === null) {
+    return { x: node.x, y: node.y };
+  }
 
   const parent = nodesMap.get(node.parentId);
-  if (!parent) return { x: node.x, y: node.y };
+  if (!parent) {
+    return { x: node.x, y: node.y };
+  }
 
   const parentAbs = getAbsolutePos(parent, nodesMap);
   // node.x/y are relative to parent's content box.
@@ -33,7 +37,9 @@ type PdfmeSchema = Schema & Record<string, any>;
 
 function visitNode(id: string, nodesMap: Map<string, EditorNode>, out: PdfmeSchema[]): void {
   const node = nodesMap.get(id);
-  if (!node) return;
+  if (!node) {
+    return;
+  }
 
   const abs = getAbsolutePos(node, nodesMap);
 

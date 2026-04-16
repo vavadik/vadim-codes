@@ -39,10 +39,10 @@ const node = computed(() => store.getNode(props.nodeId) as ImageNode);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  border: 1px dashed #d1d5db;
+  background: var(--color-base-200);
+  border: 1px dashed var(--color-base-300);
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: color-mix(in oklch, var(--color-base-content) 40%, transparent);
   user-select: none;
 }
 </style>

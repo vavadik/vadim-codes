@@ -14,7 +14,7 @@ export const useEditorStore = defineStore('editor', () => {
     padding: [0, 0, 0, 0],
   });
   const zoom = ref(1);
-  const showOutlines = ref(false);
+  const showOutlines = ref(localStorage.getItem('editor-show-outlines') === 'true');
 
   // ---- Getters ----
   const selectedNode = computed(() =>
@@ -27,7 +27,9 @@ export const useEditorStore = defineStore('editor', () => {
 
   function getChildren(parentId: string): EditorNode[] {
     const parent = nodes.value.get(parentId);
-    if (!parent || parent.kind !== 'container') return [];
+    if (!parent || parent.kind !== 'container') {
+      return [];
+    }
     return (parent as ContainerNode).childIds
       .map((id) => nodes.value.get(id))
       .filter((n): n is EditorNode => n !== undefined);
@@ -37,7 +39,9 @@ export const useEditorStore = defineStore('editor', () => {
   function getAllContainerIds(): string[] {
     const result: string[] = [];
     for (const [id, node] of nodes.value) {
-      if (node.kind === 'container') result.push(id);
+      if (node.kind === 'container') {
+        result.push(id);
+      }
     }
     return result;
   }
@@ -58,7 +62,9 @@ export const useEditorStore = defineStore('editor', () => {
         (parent as ContainerNode).childIds.push(node.id);
       }
     }
-    if (node.parentId !== null) bumpLayout();
+    if (node.parentId !== null) {
+      bumpLayout();
+    }
   }
 
   /**
@@ -67,7 +73,9 @@ export const useEditorStore = defineStore('editor', () => {
    */
   function setParent(nodeId: string, newParentId: string | null, index?: number): void {
     const node = nodes.value.get(nodeId);
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     // Detach from old location
     if (node.parentId === null) {
@@ -84,14 +92,20 @@ export const useEditorStore = defineStore('editor', () => {
     node.parentId = newParentId;
 
     if (newParentId === null) {
-      if (index !== undefined) rootIds.value.splice(index, 0, nodeId);
-      else rootIds.value.push(nodeId);
+      if (index !== undefined) {
+        rootIds.value.splice(index, 0, nodeId);
+      } else {
+        rootIds.value.push(nodeId);
+      }
     } else {
       const newParent = nodes.value.get(newParentId);
       if (newParent?.kind === 'container') {
         const childIds = (newParent as ContainerNode).childIds;
-        if (index !== undefined) childIds.splice(index, 0, nodeId);
-        else childIds.push(nodeId);
+        if (index !== undefined) {
+          childIds.splice(index, 0, nodeId);
+        } else {
+          childIds.push(nodeId);
+        }
       }
     }
 
@@ -100,15 +114,22 @@ export const useEditorStore = defineStore('editor', () => {
 
   function updateNode(id: string, patch: Partial<EditorNode>): void {
     const node = nodes.value.get(id);
-    if (!node) return;
-    const sizeChanged = 'width' in patch || 'height' in patch;
+    if (!node) {
+      return;
+    }
+    const sizeChanged =
+      'width' in patch || 'height' in patch || 'flexGrow' in patch || 'flexShrink' in patch;
     Object.assign(node, patch);
-    if (sizeChanged && node.parentId !== null) bumpLayout();
+    if (sizeChanged && (node.parentId !== null || node.kind === 'container')) {
+      bumpLayout();
+    }
   }
 
   function updateFlex(id: string, patch: Partial<ContainerNode>): void {
     const node = nodes.value.get(id) as ContainerNode | undefined;
-    if (!node || node.kind !== 'container') return;
+    if (!node || node.kind !== 'container') {
+      return;
+    }
     Object.assign(node, patch);
     bumpLayout();
   }
@@ -116,7 +137,9 @@ export const useEditorStore = defineStore('editor', () => {
   /** Move a root-level node by delta (mm). Ignored for flex children. */
   function moveNode(id: string, dx: number, dy: number): void {
     const node = nodes.value.get(id);
-    if (!node || node.parentId !== null) return;
+    if (!node || node.parentId !== null) {
+      return;
+    }
     node.x = Math.max(0, node.x + dx);
     node.y = Math.max(0, node.y + dy);
   }
@@ -146,7 +169,9 @@ export const useEditorStore = defineStore('editor', () => {
 
   function deleteNode(id: string): void {
     const node = nodes.value.get(id);
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     // Recursively delete children first
     if (node.kind === 'container') {
@@ -168,7 +193,9 @@ export const useEditorStore = defineStore('editor', () => {
     }
 
     nodes.value.delete(id);
-    if (selectedId.value === id) selectedId.value = null;
+    if (selectedId.value === id) {
+      selectedId.value = null;
+    }
     bumpLayout();
   }
 
@@ -178,6 +205,7 @@ export const useEditorStore = defineStore('editor', () => {
 
   function toggleOutlines(): void {
     showOutlines.value = !showOutlines.value;
+    localStorage.setItem('editor-show-outlines', String(showOutlines.value));
   }
 
   return {

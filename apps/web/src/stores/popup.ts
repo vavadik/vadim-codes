@@ -22,7 +22,9 @@ export const usePopupStore = defineStore('popup', () => {
 
   function pop(id: number, value: unknown = undefined): void {
     const index = stack.value.findIndex((e) => e.id === id);
-    if (index === -1) return;
+    if (index === -1) {
+      return;
+    }
     const entry = stack.value[index];
     stack.value.splice(index, 1);
     entry?.resolve(value);

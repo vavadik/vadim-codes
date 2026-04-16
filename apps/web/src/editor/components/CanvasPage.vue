@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useEditorStore } from '@/stores/editor';
-import { useDragDrop } from '@/editor/composables/useDragDrop';
+import { useDragDrop, registerPageEl } from '@/editor/composables/useDragDrop';
 import { useCanvasScale } from '@/editor/composables/useCanvasScale';
 import CanvasNode from './CanvasNode.vue';
 
@@ -23,6 +23,12 @@ const { onPaletteDragOver, onPaletteDrop } = useDragDrop();
 const { toPx } = useCanvasScale();
 
 const pageRef = ref<HTMLDivElement>();
+
+onMounted(() => {
+  if (pageRef.value) {
+    registerPageEl(pageRef.value);
+  }
+});
 
 const pageStyle = computed(() => ({
   width: `${toPx(store.page.width)}px`,
@@ -34,7 +40,9 @@ function onDragOver(e: DragEvent) {
 }
 
 function onDrop(e: DragEvent) {
-  if (pageRef.value) onPaletteDrop(e, pageRef.value);
+  if (pageRef.value) {
+    onPaletteDrop(e, pageRef.value);
+  }
 }
 </script>
 

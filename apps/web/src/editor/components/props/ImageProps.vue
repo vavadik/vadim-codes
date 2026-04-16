@@ -19,7 +19,9 @@ const node = computed(() => store.getNode(props.nodeId) as ImageNode);
 
 function onFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+  if (!file) {
+    return;
+  }
   const reader = new FileReader();
   reader.onload = () => {
     store.updateNode(props.nodeId, { content: reader.result as string });

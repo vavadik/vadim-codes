@@ -21,7 +21,9 @@ const store = useEditorStore();
 
 function onInput(e: Event) {
   const val = parseInt((e.target as HTMLInputElement).value, 10);
-  if (!isNaN(val)) store.setZoom(val / 100);
+  if (!isNaN(val)) {
+    store.setZoom(val / 100);
+  }
 }
 </script>
 

@@ -23,13 +23,18 @@ const dialogRef = ref<HTMLDialogElement | null>(null);
 watch(
   () => props.open,
   (val) => {
-    if (val) dialogRef.value?.showModal();
-    else dialogRef.value?.close();
+    if (val) {
+      dialogRef.value?.showModal();
+    } else {
+      dialogRef.value?.close();
+    }
   },
   { immediate: true }
 );
 
 function onBackdropClick(e: MouseEvent) {
-  if (e.target === dialogRef.value) emit('close');
+  if (e.target === dialogRef.value) {
+    emit('close');
+  }
 }
 </script>

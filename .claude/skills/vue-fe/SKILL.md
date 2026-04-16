@@ -190,6 +190,52 @@ Rules:
 
 - **One block per component** — the block name matches the component's root element class.
 - BEM classes only. Do not mix Tailwind utilities and BEM in the same element — pick one per component. Tailwind utilities are for quick layout primitives in page-level wrappers; BEM SCSS is for anything with meaningful component-specific style.
-- Use CSS custom properties (`var(--color-primary)` etc.) from the design system for colours — no hardcoded hex values.
+- **No hardcoded color values** — never write hex, rgb, oklch, or hsl literals in component styles. Always use a CSS custom property from the design system. If the right token doesn't exist, add it to the theme in `src/assets/main.css` first.
 - Only add `<style scoped lang="scss">` if styles are actually needed. Don't add an empty block.
 - Avoid global styles in component files.
+
+## Design system color tokens
+
+All tokens are defined in `src/assets/main.css` — both `light` and `dark` theme blocks. Every token must be present in both themes.
+
+### Surface tokens
+
+| Token                  | Usage                                              |
+| ---------------------- | -------------------------------------------------- |
+| `--color-base-100`     | Panel backgrounds, cards, inputs                   |
+| `--color-base-200`     | Canvas background, toolbar strip, alternating rows |
+| `--color-base-300`     | Borders, dividers, resize handles                  |
+| `--color-base-content` | Default text and icon color                        |
+
+### Interactive / accent tokens
+
+| Token                         | Usage                                                     |
+| ----------------------------- | --------------------------------------------------------- |
+| `--color-accent`              | Selection outlines, active states, primary action buttons |
+| `--color-accent-content`      | Text/icons on accent-colored backgrounds                  |
+| `--color-accent-hover`        | Hover state of accent-colored elements                    |
+| `--color-accent-subtle`       | Subtle tinted background for active/toggled states        |
+| `--color-accent-subtle-hover` | Hover on accent-subtle backgrounds                        |
+
+### Semantic tokens
+
+| Token                     | Usage                           |
+| ------------------------- | ------------------------------- |
+| `--color-error`           | Error borders, error text       |
+| `--color-error-subtle`    | Error background tint           |
+| `--color-primary`         | Brand color (links, highlights) |
+| `--color-neutral`         | Tooltip backgrounds             |
+| `--color-neutral-content` | Text on neutral backgrounds     |
+
+### Muted / opacity patterns
+
+For muted text or faint outlines where no named token exists, use `color-mix`:
+
+```scss
+// ~40% opacity muted text
+color: color-mix(in oklch, var(--color-base-content) 40%, transparent);
+```
+
+### Canvas page exception
+
+The PDF canvas page (`CanvasPage.vue`) intentionally uses literal white and dark text because it represents printed paper, not a themed UI surface. This is the **only** acceptable exception to the no-hardcoded-colors rule.
