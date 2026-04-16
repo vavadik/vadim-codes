@@ -3,57 +3,61 @@
     <div class="editor-root">
       <div class="editor-toolbar">
         <span class="editor-toolbar__title">PDF Editor</span>
+        <button
+          class="btn btn-sm"
+          :class="store.showOutlines ? 'btn-neutral' : 'btn-ghost'"
+          @click="store.toggleOutlines()"
+        >
+          Outlines
+        </button>
         <button class="btn btn-primary btn-sm" :disabled="exporting" @click="exportPdf">
           <span v-if="exporting" class="loading loading-spinner loading-xs" />
           Export PDF
         </button>
       </div>
-      <div ref="designerRef" class="editor-designer" />
+
+      <div class="editor-body">
+        <ElementPalette />
+        <EditorCanvas />
+        <PropertiesPanel />
+      </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { Designer } from '@pdfme/ui';
+import { ref, watch, onMounted } from 'vue';
 import { generate } from '@pdfme/generator';
-import { text, table, image } from '@pdfme/schemas';
-import type { Template } from '@pdfme/common';
+import { text, table, image, rectangle } from '@pdfme/schemas';
 import AppLayout from '@/components/layouts/AppLayout.vue';
+import ElementPalette from '@/editor/components/ElementPalette.vue';
+import EditorCanvas from '@/editor/components/EditorCanvas.vue';
+import PropertiesPanel from '@/editor/components/PropertiesPanel.vue';
+import { useEditorStore } from '@/stores/editor';
+import { useYogaLayout } from '@/editor/composables/useYogaLayout';
+import { buildPdfmeTemplate, buildInputs } from '@/editor/utils/toPdfmeTemplate';
 
-const plugins = { Text: text, Table: table, Image: image };
+const plugins = { Text: text, Table: table, Image: image, Rectangle: rectangle };
 
-const blankTemplate: Template = {
-  basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] },
-  schemas: [[]],
-};
-
-const designerRef = ref<HTMLDivElement>();
+const store = useEditorStore();
+const { initYoga, yogaReady, recalculateAll } = useYogaLayout();
 const exporting = ref(false);
-let designer: Designer | null = null;
 
-onMounted(() => {
-  if (!designerRef.value) return;
-  designer = new Designer({
-    domContainer: designerRef.value,
-    template: blankTemplate,
-    plugins,
-  });
+onMounted(async () => {
+  await initYoga();
 });
 
-onUnmounted(() => {
-  designer?.destroy();
-  designer = null;
+// Re-run Yoga whenever layout-affecting store mutations occur
+watch([() => store.layoutVersion, yogaReady], ([, ready]) => {
+  if (ready) recalculateAll();
 });
 
 async function exportPdf() {
-  if (!designer) return;
   exporting.value = true;
   try {
-    const template = designer.getTemplate();
-    const inputs = [
-      Object.fromEntries(template.schemas.flat().map((s) => [s.name, String(s.content ?? '')])),
-    ];
+    const template = buildPdfmeTemplate(store.nodes, store.rootIds, store.page);
+    const schemas = template.schemas.flat();
+    const inputs = buildInputs(schemas);
     const pdf = await generate({ template, inputs, plugins });
     const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
     window.open(URL.createObjectURL(blob));
@@ -87,7 +91,8 @@ async function exportPdf() {
   }
 }
 
-.editor-designer {
+.editor-body {
+  display: flex;
   flex: 1;
   overflow: hidden;
 }

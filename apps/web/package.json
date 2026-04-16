@@ -17,10 +17,12 @@
     "@pdfme/schemas": "^6.0.6",
     "@pdfme/ui": "^6.0.6",
     "@tailwindcss/vite": "^4.2.2",
+    "nanoid": "^5.1.9",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.31",
-    "vue-router": "^5.0.4"
+    "vue-router": "^5.0.4",
+    "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
