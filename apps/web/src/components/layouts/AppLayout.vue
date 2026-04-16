@@ -8,6 +8,10 @@
         <RouterLink to="/design-system" class="link link-hover text-sm">Design System</RouterLink>
         <RouterLink to="/editor" class="link link-hover text-sm">Editor</RouterLink>
         <a href="#" class="link link-hover text-sm">GitHub</a>
+        <div v-if="authStore.isAuthenticated" class="flex items-center gap-3">
+          <span class="text-sm text-base-content/60">{{ authStore.user?.email }}</span>
+          <button class="btn btn-ghost btn-xs" @click="handleLogout">Sign out</button>
+        </div>
         <button
           class="theme-toggle"
           :aria-label="theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'"
@@ -40,9 +44,18 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
+import { useAuthStore } from '@/stores/auth';
 
 const { theme, toggle } = useTheme();
+const authStore = useAuthStore();
+const router = useRouter();
+
+async function handleLogout() {
+  await authStore.logout();
+  router.push({ name: 'login' });
+}
 </script>
 
 <style scoped lang="scss">
