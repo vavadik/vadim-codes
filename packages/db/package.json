@@ -15,6 +15,7 @@
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "studio": "prisma studio",
+    "seed": "prisma db seed",
     "build": "prisma generate && tsup",
     "dev": "tsup --watch",
     "check-types": "tsc --noEmit"
@@ -30,6 +31,7 @@
     "@types/pg": "^8.20.0",
     "prisma": "^7.7.0",
     "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
     "typescript": "^5.7.0"
   },
   "prisma": {

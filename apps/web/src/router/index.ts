@@ -15,6 +15,10 @@ const router = createRouter({
       path: '/editor',
       component: () => import('@/pages/EditorPage.vue'),
     },
+    {
+      path: '/todos',
+      component: () => import('@/pages/TodoPage.vue'),
+    },
   ],
 });
 
