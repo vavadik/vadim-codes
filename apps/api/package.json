@@ -19,9 +19,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@composer-ai/contracts": "workspace:*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.3.0",
+    "@ts-rest/core": "3.53.0-rc.1",
+    "@ts-rest/nest": "3.53.0-rc.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
