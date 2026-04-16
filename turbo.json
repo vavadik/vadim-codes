@@ -30,6 +30,10 @@
       "dependsOn": ["@composer-ai/contracts#build", "@composer-ai/db#build"],
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "cache": false
     }
   }
 }
