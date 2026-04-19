@@ -38,7 +38,6 @@ export class AuthController {
   @Get('salesforce/callback')
   @UseGuards(SalesforceAuthGuard)
   async callback(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
-    console.log({ req });
     const sfUser = req.user as unknown as SfUser;
     const { jwt, rawToken } = await this.authService.handleSfCallback(sfUser);
 
@@ -50,7 +49,6 @@ export class AuthController {
       ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log({ jwt });
     res.redirect(this.config.getOrThrow<string>('SF_AUTH_SUCCESS_REDIRECT'));
   }
 

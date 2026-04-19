@@ -11,10 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@composer-ai/contracts': fileURLToPath(
+        new URL('../../packages/contracts/src/index.ts', import.meta.url)
+      ),
     },
-  },
-  optimizeDeps: {
-    include: ['@composer-ai/contracts'],
   },
   server: {
     proxy: {

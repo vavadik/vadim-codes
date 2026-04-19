@@ -6,7 +6,6 @@ import type { TodoDto } from '@composer-ai/contracts';
 export const useTodoStore = defineStore('todo', () => {
   const todos = ref<TodoDto[]>([]);
   const loading = ref(false);
-  console.log(apiClient);
   async function fetchAll() {
     loading.value = true;
     try {

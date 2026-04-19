@@ -7,6 +7,7 @@
       <div class="navbar-end gap-4">
         <RouterLink to="/salesforce" class="link link-hover text-sm">Salesforce</RouterLink>
         <RouterLink to="/design-system" class="link link-hover text-sm">Design System</RouterLink>
+        <RouterLink to="/todos" class="link link-hover text-sm">Todos</RouterLink>
         <RouterLink to="/editor" class="link link-hover text-sm">Editor</RouterLink>
         <a href="#" class="link link-hover text-sm">GitHub</a>
         <div v-if="authStore.isAuthenticated" class="flex items-center gap-3">

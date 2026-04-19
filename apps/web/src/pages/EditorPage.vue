@@ -180,7 +180,6 @@ async function exportPdf() {
     const template = buildPdfmeTemplate(store.nodes, store.rootIds, store.page);
     const schemas = template.schemas.flat();
     const inputs = buildInputs(schemas);
-    console.log({ template, inputs });
     const pdf = await generate({ template: JSON.parse(JSON.stringify(template)), inputs, plugins });
     const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
     window.open(URL.createObjectURL(blob));
