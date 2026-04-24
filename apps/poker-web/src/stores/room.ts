@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type {
   CardsRevealedPayload,
+  DeckChangedPayload,
   ParticipantPayload,
   RoomStatePayload,
 } from '@vadim-codes/poker-contracts';
@@ -78,6 +79,26 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  function taskUpdated(task: string): void {
+    if (!room.value) {
+      return;
+    }
+    room.value.currentTask = task;
+  }
+
+  function deckChanged(payload: DeckChangedPayload): void {
+    if (!room.value) {
+      return;
+    }
+    room.value.deck = payload.deck;
+    room.value.deckValues = payload.deckValues;
+    room.value.state = 'voting';
+    room.value.votes = null;
+    for (const p of room.value.participants) {
+      p.hasVoted = false;
+    }
+  }
+
   function roundReset(): void {
     if (!room.value) {
       return;
@@ -107,6 +128,8 @@ export const useRoomStore = defineStore('room', () => {
     participantReconnected,
     cardSelected,
     cardsRevealed,
+    taskUpdated,
+    deckChanged,
     roundReset,
     clear,
   };

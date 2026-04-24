@@ -38,10 +38,10 @@ After this phase: vote visibility, task context, results analytics, and deck fle
 
 | #     | Story                                                             | Status | Notes                                      |
 | ----- | ----------------------------------------------------------------- | ------ | ------------------------------------------ |
-| PS-07 | [Vote status indicators](stories/PS-07-vote-status-indicators.md) | ⬜     | Face-down / voted / revealed seat states   |
-| PS-08 | [Set current task](stories/PS-08-set-current-task.md)             | ⬜     | Inline edit, broadcast                     |
-| PS-09 | [Results summary](stories/PS-09-results-summary.md)               | ⬜     | Average + histogram after reveal           |
-| PS-10 | [Card deck selection](stories/PS-10-deck-selection.md)            | ⬜     | Fibonacci / T-shirt / Powers of 2 / Custom |
+| PS-07 | [Vote status indicators](stories/PS-07-vote-status-indicators.md) | ✅     | PlayerSeat component: idle/voted/revealed  |
+| PS-08 | [Set current task](stories/PS-08-set-current-task.md)             | ✅     | Inline edit for master, read-only others   |
+| PS-09 | [Results summary](stories/PS-09-results-summary.md)               | ✅     | Average + histogram after reveal           |
+| PS-10 | [Card deck selection](stories/PS-10-deck-selection.md)            | ✅     | Fibonacci / T-shirt / Powers of 2 / Custom |
 
 ---
 

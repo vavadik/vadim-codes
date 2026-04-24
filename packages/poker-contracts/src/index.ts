@@ -10,6 +10,11 @@ export type {
   ParticipantJoinedPayload,
   ParticipantLeftPayload,
   ParticipantDisconnectedPayload,
+  ParticipantReconnectedPayload,
   CardSelectedPayload,
   CardsRevealedPayload,
+  SetTaskPayload,
+  TaskUpdatedPayload,
+  SetDeckPayload,
+  DeckChangedPayload,
 } from './types/ws.types';

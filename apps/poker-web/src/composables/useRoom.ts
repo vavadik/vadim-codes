@@ -2,11 +2,14 @@ import { onMounted, onUnmounted } from 'vue';
 import { io, type Socket } from 'socket.io-client';
 import type {
   CardsRevealedPayload,
+  DeckChangedPayload,
   ParticipantJoinedPayload,
   ParticipantDisconnectedPayload,
+  ParticipantReconnectedPayload,
   ParticipantLeftPayload,
   CardSelectedPayload,
   RoomStatePayload,
+  TaskUpdatedPayload,
 } from '@vadim-codes/poker-contracts';
 import { useSession } from './useSession';
 import { useRoomStore } from '@/stores/room';
@@ -54,6 +57,10 @@ export function useRoom(roomId: string) {
       store.participantDisconnected(sid);
     });
 
+    socket.on('participantReconnected', ({ sessionId: sid }: ParticipantReconnectedPayload) => {
+      store.participantReconnected(sid);
+    });
+
     socket.on('cardSelected', ({ sessionId: sid }: CardSelectedPayload) => {
       store.cardSelected(sid);
     });
@@ -64,6 +71,14 @@ export function useRoom(roomId: string) {
 
     socket.on('roundReset', () => {
       store.roundReset();
+    });
+
+    socket.on('taskUpdated', ({ task }: TaskUpdatedPayload) => {
+      store.taskUpdated(task);
+    });
+
+    socket.on('deckChanged', (payload: DeckChangedPayload) => {
+      store.deckChanged(payload);
     });
 
     socket.on('disconnect', () => {
@@ -83,6 +98,14 @@ export function useRoom(roomId: string) {
     socket?.emit('reset');
   }
 
+  function setTask(task: string): void {
+    socket?.emit('setTask', { task });
+  }
+
+  function setDeck(deck: string, deckValues?: string[]): void {
+    socket?.emit('setDeck', { deck, deckValues });
+  }
+
   onMounted(() => {
     store.clear();
     connect();
@@ -93,5 +116,5 @@ export function useRoom(roomId: string) {
     socket = null;
   });
 
-  return { store, selectCard, reveal, reset };
+  return { store, selectCard, reveal, reset, setTask, setDeck };
 }

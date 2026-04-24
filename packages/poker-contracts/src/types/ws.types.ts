@@ -48,10 +48,36 @@ export interface ParticipantDisconnectedPayload {
   sessionId: string;
 }
 
+export interface ParticipantReconnectedPayload {
+  sessionId: string;
+}
+
 export interface CardSelectedPayload {
   sessionId: string;
 }
 
 export interface CardsRevealedPayload {
   votes: Record<string, string | null>;
+}
+
+// ── PS-08: Set current task ──────────────────────────────────────────────────
+
+export interface SetTaskPayload {
+  task: string;
+}
+
+export interface TaskUpdatedPayload {
+  task: string;
+}
+
+// ── PS-10: Deck selection ────────────────────────────────────────────────────
+
+export interface SetDeckPayload {
+  deck: DeckName;
+  deckValues?: string[]; // required when deck === 'custom'
+}
+
+export interface DeckChangedPayload {
+  deck: DeckName;
+  deckValues: string[];
 }

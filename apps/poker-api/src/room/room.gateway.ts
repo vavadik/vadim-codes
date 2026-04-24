@@ -10,11 +10,16 @@ import {
 import type { Server, Socket } from 'socket.io';
 import type {
   CardsRevealedPayload,
+  DeckChangedPayload,
   JoinPayload,
   ParticipantPayload,
+  ParticipantReconnectedPayload,
   Room,
   RoomStatePayload,
   SelectCardPayload,
+  SetDeckPayload,
+  SetTaskPayload,
+  TaskUpdatedPayload,
 } from '@vadim-codes/poker-contracts';
 import { RoomService } from './room.service';
 
@@ -79,6 +84,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (isReconnect) {
       await this.roomService.reconnectParticipant(roomId, sessionId, client.id);
+      // Tell everyone else this participant is back online
+      const reconnectedPayload: ParticipantReconnectedPayload = { sessionId };
+      client.to(roomId).emit('participantReconnected', reconnectedPayload);
     } else {
       const isFirstParticipant = room.participants.size === 0;
       await this.roomService.addParticipant(roomId, {
@@ -168,6 +176,41 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const payload: CardsRevealedPayload = { votes };
     this.server.to(roomId).emit('cardsRevealed', payload);
+  }
+
+  @SubscribeMessage('setTask')
+  handleSetTask(@ConnectedSocket() client: Socket, @MessageBody() payload: SetTaskPayload): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId) {
+      return;
+    }
+    this.roomService.setTask(roomId, payload.task);
+    const response: TaskUpdatedPayload = { task: room.currentTask };
+    this.server.to(roomId).emit('taskUpdated', response);
+  }
+
+  @SubscribeMessage('setDeck')
+  handleSetDeck(@ConnectedSocket() client: Socket, @MessageBody() payload: SetDeckPayload): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId) {
+      return;
+    }
+    const updated = this.roomService.setDeck(roomId, payload.deck, payload.deckValues);
+    if (!updated) {
+      return;
+    }
+    const response: DeckChangedPayload = { deck: updated.deck, deckValues: updated.deckValues };
+    this.server.to(roomId).emit('deckChanged', response);
   }
 
   @SubscribeMessage('reset')

@@ -92,6 +92,41 @@ export class RoomService {
     return room;
   }
 
+  setTask(roomId: string, task: string): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return undefined;
+    }
+    room.currentTask = task.slice(0, 256);
+    return room;
+  }
+
+  setDeck(roomId: string, deck: DeckName, customValues?: string[]): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return undefined;
+    }
+    let deckValues: string[];
+    if (deck === 'custom') {
+      if (!customValues || customValues.length === 0 || customValues.length > 20) {
+        return undefined;
+      }
+      if (customValues.some((v) => v.length === 0 || v.length > 8)) {
+        return undefined;
+      }
+      deckValues = customValues;
+    } else {
+      deckValues = [...DECK_VALUES[deck]];
+    }
+    room.deck = deck;
+    room.deckValues = deckValues;
+    for (const p of room.participants.values()) {
+      p.selectedCard = null;
+    }
+    room.state = 'voting';
+    return room;
+  }
+
   /** Marks a socket as stale. Returns { roomId, sessionId } when a slot was found, null otherwise. */
   markDisconnected(socketId: string): { roomId: string; sessionId: string } | null {
     for (const room of this.rooms.values()) {
