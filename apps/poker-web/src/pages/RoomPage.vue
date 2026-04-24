@@ -42,6 +42,9 @@
             :card-value="store.room.votes?.[p.sessionId] ?? undefined"
             :is-master="p.sessionId === store.room.masterSessionId"
             :is-connected="p.isConnected"
+            :on-kick="
+              isMaster && p.sessionId !== sessionId ? () => kickParticipant(p.sessionId) : undefined
+            "
           />
         </div>
 
@@ -101,6 +104,7 @@ const {
   transferMaster,
   togglePublicMode,
   setTitle,
+  kickParticipant,
 } = useRoom(roomId);
 
 const isMaster = computed(() => store.room?.masterSessionId === sessionId);

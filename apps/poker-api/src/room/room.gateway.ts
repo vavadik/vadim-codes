@@ -12,6 +12,7 @@ import type {
   CardsRevealedPayload,
   DeckChangedPayload,
   JoinPayload,
+  KickParticipantPayload,
   MasterChangedPayload,
   ParticipantPayload,
   ParticipantReconnectedPayload,
@@ -71,7 +72,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() payload: JoinPayload
   ): Promise<void> {
     const { roomId, sessionId, name } = payload;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
 
     if (!room) {
       client.emit('roomNotFound', { roomId });
@@ -102,7 +103,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         selectedCard: null,
       });
       if (isFirstParticipant) {
-        room.masterSessionId = sessionId;
+        this.roomService.setMaster(roomId, sessionId);
       }
     }
 
@@ -124,17 +125,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('selectCard')
-  handleSelectCard(
+  async handleSelectCard(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: SelectCardPayload
-  ): void {
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
 
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.state !== 'voting') {
       return;
     }
@@ -154,14 +155,14 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('reveal')
-  handleReveal(@ConnectedSocket() client: Socket): void {
+  async handleReveal(@ConnectedSocket() client: Socket): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
 
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.state !== 'voting') {
       return;
     }
@@ -185,16 +186,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('transferMaster')
-  handleTransferMaster(
+  async handleTransferMaster(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: TransferMasterPayload
-  ): void {
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.masterSessionId !== sessionId || payload.sessionId === sessionId) {
       return;
     }
@@ -207,16 +208,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('togglePublicMode')
-  handleTogglePublicMode(
+  async handleTogglePublicMode(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: TogglePublicModePayload
-  ): void {
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.masterSessionId !== sessionId) {
       return;
     }
@@ -229,13 +230,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('setTitle')
-  handleSetTitle(@ConnectedSocket() client: Socket, @MessageBody() payload: SetTitlePayload): void {
+  async handleSetTitle(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: SetTitlePayload
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.masterSessionId !== sessionId) {
       return;
     }
@@ -248,13 +252,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('setTask')
-  handleSetTask(@ConnectedSocket() client: Socket, @MessageBody() payload: SetTaskPayload): void {
+  async handleSetTask(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: SetTaskPayload
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || (room.masterSessionId !== sessionId && !room.isPublicMode)) {
       return;
     }
@@ -264,13 +271,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('setDeck')
-  handleSetDeck(@ConnectedSocket() client: Socket, @MessageBody() payload: SetDeckPayload): void {
+  async handleSetDeck(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: SetDeckPayload
+  ): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.masterSessionId !== sessionId) {
       return;
     }
@@ -282,15 +292,45 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomId).emit('deckChanged', response);
   }
 
+  @SubscribeMessage('kickParticipant')
+  async handleKickParticipant(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: KickParticipantPayload
+  ): Promise<void> {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = await this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId || payload.sessionId === sessionId) {
+      return;
+    }
+    const target = room.participants.get(payload.sessionId);
+    if (!target || target.socketId !== '') {
+      return;
+    }
+
+    const key = `${roomId}:${payload.sessionId}`;
+    const timer = this.graceTimers.get(key);
+    if (timer) {
+      clearTimeout(timer);
+      this.graceTimers.delete(key);
+    }
+
+    await this.roomService.removeParticipant(roomId, payload.sessionId);
+    this.server.to(roomId).emit('participantLeft', { sessionId: payload.sessionId });
+  }
+
   @SubscribeMessage('reset')
-  handleReset(@ConnectedSocket() client: Socket): void {
+  async handleReset(@ConnectedSocket() client: Socket): Promise<void> {
     const meta = this.socketMeta.get(client.id);
     if (!meta) {
       return;
     }
 
     const { roomId, sessionId } = meta;
-    const room = this.roomService.getRoom(roomId);
+    const room = await this.roomService.getRoom(roomId);
     if (!room || room.state !== 'revealed') {
       return;
     }

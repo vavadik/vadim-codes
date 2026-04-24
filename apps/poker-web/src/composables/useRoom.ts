@@ -134,6 +134,10 @@ export function useRoom(roomId: string) {
     socket?.emit('setTitle', { title });
   }
 
+  function kickParticipant(targetSessionId: string): void {
+    socket?.emit('kickParticipant', { sessionId: targetSessionId });
+  }
+
   onMounted(() => {
     store.clear();
     if (name.value) {
@@ -163,5 +167,6 @@ export function useRoom(roomId: string) {
     transferMaster,
     togglePublicMode,
     setTitle,
+    kickParticipant,
   };
 }

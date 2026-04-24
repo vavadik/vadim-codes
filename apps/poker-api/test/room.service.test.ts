@@ -9,6 +9,8 @@ function makeService(): RoomService {
         create: vi.fn().mockResolvedValue({}),
         deleteMany: vi.fn().mockResolvedValue({}),
         updateMany: vi.fn().mockResolvedValue({}),
+        findUnique: vi.fn().mockResolvedValue(null),
+        findMany: vi.fn().mockResolvedValue([]),
       },
     },
   } as unknown as PrismaService;
@@ -25,7 +27,7 @@ describe('RoomService', () => {
     expect(room.deck).toBe('fibonacci');
     expect(room.state).toBe('voting');
     expect(room.participants.size).toBe(0);
-    expect(service.getRoom(room.id)).toBe(room);
+    expect(await service.getRoom(room.id)).toBe(room);
   });
 
   it('createRoom generates unique IDs for each room', async () => {
@@ -113,7 +115,7 @@ describe('RoomService', () => {
     const service = makeService();
     const room = await service.createRoom();
     await service.deleteRoom(room.id);
-    expect(service.getRoom(room.id)).toBeUndefined();
+    expect(await service.getRoom(room.id)).toBeUndefined();
   });
 
   it('markDisconnected clears socketId for the matching socket', async () => {

@@ -8,10 +8,12 @@ datasource db {
 }
 
 model Room {
-  id             String   @id
-  title          String   @default("")
-  deck           String   @default("fibonacci")
-  isPublicMode   Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  lastActivityAt DateTime @default(now())
+  id              String   @id
+  title           String   @default("")
+  deck            String   @default("fibonacci")
+  deckValues      String   @default("")
+  isPublicMode    Boolean  @default(false)
+  masterSessionId String?
+  createdAt       DateTime @default(now())
+  lastActivityAt  DateTime @default(now())
 }

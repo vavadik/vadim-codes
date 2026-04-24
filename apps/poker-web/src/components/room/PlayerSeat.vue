@@ -9,6 +9,14 @@
       <span v-if="isMaster"> 👑</span>
       <span v-if="!isConnected" class="player-seat__offline"> (offline)</span>
     </span>
+    <button
+      v-if="onKick && !isConnected"
+      class="player-seat__kick"
+      title="Remove from room"
+      @click="onKick"
+    >
+      ✕
+    </button>
   </div>
 </template>
 
@@ -19,6 +27,7 @@ defineProps<{
   cardValue?: string;
   isMaster?: boolean;
   isConnected?: boolean;
+  onKick?: () => void;
 }>();
 </script>
 
@@ -85,6 +94,22 @@ defineProps<{
 
   &__offline {
     color: color-mix(in oklch, var(--color-base-content) 40%, transparent);
+  }
+
+  &__kick {
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.25rem;
+    border: none;
+    color: var(--color-error-content, #fff);
+    background: var(--color-error);
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
   }
 }
 </style>

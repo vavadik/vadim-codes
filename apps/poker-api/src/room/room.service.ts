@@ -18,12 +18,13 @@ export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createRoom(title = '', deck: DeckName = 'fibonacci'): Promise<Room> {
+    const deckValues = [...DECK_VALUES[deck]];
     const room: Room = {
       id: nanoid(10),
       title,
       currentTask: '',
       deck,
-      deckValues: [...DECK_VALUES[deck]],
+      deckValues,
       isPublicMode: false,
       masterSessionId: null,
       state: 'voting' as RoomState,
@@ -36,6 +37,7 @@ export class RoomService {
         id: room.id,
         title: room.title,
         deck: room.deck,
+        deckValues: deckValues.join(','),
         isPublicMode: room.isPublicMode,
         lastActivityAt: room.lastActivityAt,
       },
@@ -43,8 +45,43 @@ export class RoomService {
     return room;
   }
 
-  getRoom(roomId: string): Room | undefined {
-    return this.rooms.get(roomId);
+  async getRoom(roomId: string): Promise<Room | undefined> {
+    const cached = this.rooms.get(roomId);
+    if (cached) {
+      return cached;
+    }
+    const dbRoom = await this.prisma.db.room.findUnique({ where: { id: roomId } });
+    if (!dbRoom) {
+      return undefined;
+    }
+    const deck = dbRoom.deck as DeckName;
+    const deckValues = dbRoom.deckValues
+      ? dbRoom.deckValues.split(',').filter(Boolean)
+      : [...(DECK_VALUES[deck] ?? DECK_VALUES.fibonacci)];
+    const room: Room = {
+      id: dbRoom.id,
+      title: dbRoom.title,
+      currentTask: '',
+      deck,
+      deckValues,
+      isPublicMode: dbRoom.isPublicMode,
+      masterSessionId: dbRoom.masterSessionId,
+      state: 'voting' as RoomState,
+      participants: new Map<string, Participant>(),
+      lastActivityAt: dbRoom.lastActivityAt,
+    };
+    this.rooms.set(room.id, room);
+    return room;
+  }
+
+  async listOwnedRooms(
+    sessionId: string
+  ): Promise<{ id: string; title: string; lastActivityAt: Date }[]> {
+    return this.prisma.db.room.findMany({
+      where: { masterSessionId: sessionId },
+      select: { id: true, title: true, lastActivityAt: true },
+      orderBy: { lastActivityAt: 'desc' },
+    });
   }
 
   async deleteRoom(roomId: string): Promise<void> {
@@ -92,12 +129,23 @@ export class RoomService {
     return room;
   }
 
+  setMaster(roomId: string, sessionId: string): void {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return;
+    }
+    room.masterSessionId = sessionId;
+    this.prisma.db.room
+      .updateMany({ where: { id: roomId }, data: { masterSessionId: sessionId } })
+      .catch((err) => console.error('Failed to persist masterSessionId for room', roomId, err));
+  }
+
   transferMaster(roomId: string, newSessionId: string): Room | undefined {
     const room = this.rooms.get(roomId);
     if (!room || !room.participants.has(newSessionId)) {
       return undefined;
     }
-    room.masterSessionId = newSessionId;
+    this.setMaster(roomId, newSessionId);
     return room;
   }
 
@@ -157,6 +205,9 @@ export class RoomService {
       p.selectedCard = null;
     }
     room.state = 'voting';
+    this.prisma.db.room
+      .updateMany({ where: { id: roomId }, data: { deck, deckValues: deckValues.join(',') } })
+      .catch((err) => console.error('Failed to persist deck for room', roomId, err));
     return room;
   }
 

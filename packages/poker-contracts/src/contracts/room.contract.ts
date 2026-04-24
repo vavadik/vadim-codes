@@ -3,7 +3,21 @@ import { z } from 'zod';
 
 const c = initContract();
 
+const ownedRoomSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  lastActivityAt: z.string(),
+});
+
 export const roomContract = c.router({
+  listOwnedRooms: {
+    method: 'GET',
+    path: '/rooms',
+    headers: z.object({ 'x-session-id': z.string() }),
+    responses: {
+      200: z.array(ownedRoomSchema),
+    },
+  },
   createRoom: {
     method: 'POST',
     path: '/rooms',

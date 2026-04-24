@@ -23,4 +23,5 @@ export type {
   PublicModeChangedPayload,
   SetTitlePayload,
   TitleUpdatedPayload,
+  KickParticipantPayload,
 } from './types/ws.types';

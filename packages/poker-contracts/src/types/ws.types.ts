@@ -111,3 +111,9 @@ export interface SetTitlePayload {
 export interface TitleUpdatedPayload {
   title: string;
 }
+
+// ── Kick offline participant ──────────────────────────────────────────────────
+
+export interface KickParticipantPayload {
+  sessionId: string;
+}

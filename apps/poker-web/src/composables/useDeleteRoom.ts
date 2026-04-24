@@ -12,30 +12,30 @@ export function useDeleteRoom() {
   async function deleteRoom(roomId: string, redirectHome = false): Promise<boolean> {
     isDeleting.value = true;
     deleteError.value = '';
+    let success = true;
     try {
       const res = await roomApi.deleteRoom({
         params: { id: roomId },
         headers: { 'x-session-id': sessionId },
       });
-      if (res.status === 204) {
-        removeRoom(roomId);
-        if (redirectHome) {
-          await router.push('/');
-        }
-        return true;
-      }
       if (res.status === 403) {
         deleteError.value = 'Not authorised to delete this room.';
-      } else {
+        success = false;
+      } else if (res.status !== 204 && res.status !== 404) {
         deleteError.value = 'Failed to delete room.';
+        success = false;
       }
-      return false;
     } catch {
       deleteError.value = 'Network error.';
-      return false;
+      success = false;
     } finally {
       isDeleting.value = false;
     }
+    removeRoom(roomId);
+    if (redirectHome) {
+      await router.push('/');
+    }
+    return success;
   }
 
   return { deleteRoom, isDeleting, deleteError };

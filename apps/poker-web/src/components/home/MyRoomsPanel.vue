@@ -11,7 +11,7 @@
           <div class="my-rooms__item-info">
             <span class="my-rooms__item-crown" title="You own this room">👑</span>
             <span class="my-rooms__item-title">{{ room.title || 'Untitled room' }}</span>
-            <span class="my-rooms__item-time">{{ relativeTime(room.lastVisited) }}</span>
+            <span class="my-rooms__item-time">{{ relativeTime(room.lastActivityAt) }}</span>
           </div>
           <div class="my-rooms__item-actions">
             <Button size="xs" variant="ghost" @click="openRoom(room.id)">Open</Button>
@@ -45,22 +45,39 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Alert, Button } from '@/components/ui';
 import { useSession } from '@/composables/useSession';
 import { useDeleteRoom } from '@/composables/useDeleteRoom';
+import { roomApi } from '@/api/roomApi';
 
 const router = useRouter();
-const { rooms } = useSession();
+const { sessionId, rooms } = useSession();
 const { deleteRoom } = useDeleteRoom();
 
 const deletingId = ref<string | null>(null);
 const toastMessage = ref('');
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-const ownedRooms = computed(() => rooms.value.filter((r) => r.isOwner));
-const recentRooms = computed(() => rooms.value.filter((r) => !r.isOwner));
+interface OwnedRoom {
+  id: string;
+  title: string;
+  lastActivityAt: string;
+}
+const ownedRooms = ref<OwnedRoom[]>([]);
+
+async function fetchOwnedRooms(): Promise<void> {
+  const res = await roomApi.listOwnedRooms({ headers: { 'x-session-id': sessionId } });
+  if (res.status === 200) {
+    ownedRooms.value = res.body;
+  }
+}
+
+onMounted(fetchOwnedRooms);
+
+const ownedIds = computed(() => new Set(ownedRooms.value.map((r) => r.id)));
+const recentRooms = computed(() => rooms.value.filter((r) => !ownedIds.value.has(r.id)));
 
 function openRoom(id: string): void {
   router.push(`/room/${id}`);
@@ -70,7 +87,9 @@ async function onDelete(id: string): Promise<void> {
   deletingId.value = id;
   const ok = await deleteRoom(id);
   deletingId.value = null;
-  if (!ok) {
+  if (ok) {
+    ownedRooms.value = ownedRooms.value.filter((r) => r.id !== id);
+  } else {
     showToast('Failed to delete room.');
   }
 }
