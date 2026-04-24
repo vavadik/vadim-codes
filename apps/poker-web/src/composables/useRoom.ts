@@ -14,7 +14,7 @@ import type {
 import { useSession } from './useSession';
 import { useRoomStore } from '@/stores/room';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL ?? window.location.origin;
 
 export function useRoom(roomId: string) {
   const { sessionId, name, addRoom } = useSession();
@@ -24,7 +24,7 @@ export function useRoom(roomId: string) {
 
   function connect(): void {
     store.isConnecting = true;
-    socket = io(API_URL, { transports: ['websocket'] });
+    socket = io(API_URL, { path: '/api/socket.io', transports: ['websocket'] });
 
     socket.on('connect', () => {
       socket!.emit('join', { roomId, sessionId, name: name.value });

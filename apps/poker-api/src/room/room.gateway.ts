@@ -26,7 +26,7 @@ import { RoomService } from './room.service';
 const GRACE_MS = 60_000;
 const SPECIAL_CARDS = ['?', '☕', '∞'];
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ path: '/api/socket.io' })
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() private readonly server!: Server;
 

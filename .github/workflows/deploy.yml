@@ -1,0 +1,144 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/composer-ai-api/**'
+      - 'apps/composer-ai-web/**'
+      - 'apps/poker-api/**'
+      - 'apps/poker-web/**'
+      - 'packages/composer-ai-db/**'
+      - 'packages/composer-ai-contracts/**'
+      - 'packages/poker-db/**'
+      - 'packages/poker-contracts/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      composer-api: ${{ steps.filter.outputs.composer-api }}
+      composer-web: ${{ steps.filter.outputs.composer-web }}
+      poker-api: ${{ steps.filter.outputs.poker-api }}
+      poker-web: ${{ steps.filter.outputs.poker-web }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            composer-api:
+              - 'apps/composer-ai-api/**'
+              - 'packages/composer-ai-db/**'
+              - 'packages/composer-ai-contracts/**'
+            composer-web:
+              - 'apps/composer-ai-web/**'
+              - 'packages/composer-ai-contracts/**'
+            poker-api:
+              - 'apps/poker-api/**'
+              - 'packages/poker-db/**'
+              - 'packages/poker-contracts/**'
+            poker-web:
+              - 'apps/poker-web/**'
+              - 'packages/poker-contracts/**'
+
+  sync:
+    needs: changes
+    if: |
+      needs.changes.outputs.composer-api == 'true' ||
+      needs.changes.outputs.composer-web == 'true' ||
+      needs.changes.outputs.poker-api == 'true' ||
+      needs.changes.outputs.poker-web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest code on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            cd ${{ secrets.VPS_REPO_PATH }}
+            git pull origin main
+            pnpm install --frozen-lockfile
+
+  deploy-composer-api:
+    needs: [changes, sync]
+    if: needs.changes.outputs.composer-api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and restart Composer API on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            cd ${{ secrets.VPS_REPO_PATH }}
+            docker compose up -d postgres
+            pnpm turbo run build --filter=composer-ai-api...
+            pnpm --filter=@vadim-codes/composer-ai-db migrate:deploy
+            pm2 reload apps/composer-ai-api/ecosystem.config.cjs --only composer-ai-api --update-env
+
+  deploy-composer-web:
+    needs: [changes, sync]
+    if: needs.changes.outputs.composer-web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Composer Web on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            cd ${{ secrets.VPS_REPO_PATH }}
+            pnpm turbo run build --filter=composer-ai-web...
+
+  deploy-poker-api:
+    needs: [changes, sync]
+    if: needs.changes.outputs.poker-api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and restart Poker API on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            cd ${{ secrets.VPS_REPO_PATH }}
+            docker compose up -d postgres
+            pnpm turbo run build --filter=poker-api...
+            pnpm --filter=@vadim-codes/poker-db migrate:deploy
+            pm2 reload apps/poker-api/ecosystem.config.cjs --only poker-api --update-env
+
+  deploy-poker-web:
+    needs: [changes, sync]
+    if: needs.changes.outputs.poker-web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Poker Web on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            cd ${{ secrets.VPS_REPO_PATH }}
+            pnpm turbo run build --filter=poker-web...
