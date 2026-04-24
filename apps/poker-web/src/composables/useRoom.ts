@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
 import { io, type Socket } from 'socket.io-client';
 import type {
   CardsRevealedPayload,
@@ -108,7 +108,16 @@ export function useRoom(roomId: string) {
 
   onMounted(() => {
     store.clear();
-    connect();
+    if (name.value) {
+      connect();
+    } else {
+      const stop = watch(name, (val) => {
+        if (val) {
+          stop();
+          connect();
+        }
+      });
+    }
   });
 
   onUnmounted(() => {
