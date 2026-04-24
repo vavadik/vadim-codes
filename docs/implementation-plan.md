@@ -23,12 +23,12 @@ After this phase: a user can create a room, share the link, join, pick a card, r
 
 | #     | Story                                                     | Status | Notes                           |
 | ----- | --------------------------------------------------------- | ------ | ------------------------------- |
-| PS-01 | [Display name entry](stories/PS-01-name-entry.md)         | ⬜     | Home page + localStorage        |
-| PS-02 | [Create a room](stories/PS-02-create-room.md)             | ⬜     | REST call + navigate to room    |
-| PS-03 | [Join a room via invite link](stories/PS-03-join-room.md) | ⬜     | WS join, roomState, late joiner |
-| PS-04 | [Select / change a card](stories/PS-04-select-card.md)    | ⬜     | Card hand + selectCard event    |
-| PS-05 | [Reveal cards](stories/PS-05-reveal-cards.md)             | ⬜     | Master reveal + card flip       |
-| PS-06 | [Reset round](stories/PS-06-reset-round.md)               | ⬜     | Clear votes, restart voting     |
+| PS-01 | [Display name entry](stories/PS-01-name-entry.md)         | ✅     | Home page + localStorage        |
+| PS-02 | [Create a room](stories/PS-02-create-room.md)             | ✅     | REST call + navigate to room    |
+| PS-03 | [Join a room via invite link](stories/PS-03-join-room.md) | ✅     | WS join, roomState, late joiner |
+| PS-04 | [Select / change a card](stories/PS-04-select-card.md)    | ✅     | Card hand + selectCard event    |
+| PS-05 | [Reveal cards](stories/PS-05-reveal-cards.md)             | ✅     | Master reveal + card flip       |
+| PS-06 | [Reset round](stories/PS-06-reset-round.md)               | ✅     | Clear votes, restart voting     |
 
 ---
 

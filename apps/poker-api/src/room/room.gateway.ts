@@ -1,16 +1,229 @@
-import { WebSocketGateway, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import type { Socket } from 'socket.io';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+} from '@nestjs/websockets';
+import type { Server, Socket } from 'socket.io';
+import type {
+  CardsRevealedPayload,
+  JoinPayload,
+  ParticipantPayload,
+  Room,
+  RoomStatePayload,
+  SelectCardPayload,
+} from '@vadim-codes/poker-contracts';
 import { RoomService } from './room.service';
+
+const GRACE_MS = 60_000;
+const SPECIAL_CARDS = ['?', '☕', '∞'];
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer() private readonly server!: Server;
+
+  /** socketId → { roomId, sessionId } — for disconnect lookup */
+  private readonly socketMeta = new Map<string, { roomId: string; sessionId: string }>();
+
+  /** `${roomId}:${sessionId}` → timer for 60s grace period */
+  private readonly graceTimers = new Map<string, NodeJS.Timeout>();
+
   constructor(private readonly roomService: RoomService) {}
 
-  handleConnection(_client: Socket): void {
-    // Client events handled in Phase 1 (PS-03)
-  }
+  handleConnection(_client: Socket): void {}
 
   handleDisconnect(client: Socket): void {
-    this.roomService.markDisconnected(client.id);
+    const result = this.roomService.markDisconnected(client.id);
+    this.socketMeta.delete(client.id);
+    if (!result) {
+      return;
+    }
+
+    const { roomId, sessionId } = result;
+    this.server.to(roomId).emit('participantDisconnected', { sessionId });
+
+    const key = `${roomId}:${sessionId}`;
+    const timer = setTimeout(async () => {
+      this.graceTimers.delete(key);
+      await this.roomService.removeParticipant(roomId, sessionId);
+      this.server.to(roomId).emit('participantLeft', { sessionId });
+    }, GRACE_MS);
+    this.graceTimers.set(key, timer);
+  }
+
+  @SubscribeMessage('join')
+  async handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinPayload
+  ): Promise<void> {
+    const { roomId, sessionId, name } = payload;
+    const room = this.roomService.getRoom(roomId);
+
+    if (!room) {
+      client.emit('roomNotFound', { roomId });
+      return;
+    }
+
+    // Cancel any pending grace-period eviction for this slot
+    const key = `${roomId}:${sessionId}`;
+    const existing = this.graceTimers.get(key);
+    if (existing) {
+      clearTimeout(existing);
+      this.graceTimers.delete(key);
+    }
+
+    const isReconnect = room.participants.has(sessionId);
+
+    if (isReconnect) {
+      await this.roomService.reconnectParticipant(roomId, sessionId, client.id);
+    } else {
+      const isFirstParticipant = room.participants.size === 0;
+      await this.roomService.addParticipant(roomId, {
+        sessionId,
+        socketId: client.id,
+        name,
+        selectedCard: null,
+      });
+      if (isFirstParticipant) {
+        room.masterSessionId = sessionId;
+      }
+    }
+
+    this.socketMeta.set(client.id, { roomId, sessionId });
+    await client.join(roomId);
+
+    client.emit('roomState', this.buildRoomState(room));
+
+    if (!isReconnect) {
+      const participant = room.participants.get(sessionId)!;
+      const participantPayload: ParticipantPayload = {
+        sessionId,
+        name: participant.name,
+        hasVoted: participant.selectedCard !== null,
+        isConnected: true,
+      };
+      client.to(roomId).emit('participantJoined', { participant: participantPayload });
+    }
+  }
+
+  @SubscribeMessage('selectCard')
+  handleSelectCard(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: SelectCardPayload
+  ): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.state !== 'voting') {
+      return;
+    }
+
+    const participant = room.participants.get(sessionId);
+    if (!participant) {
+      return;
+    }
+
+    const allValues = [...room.deckValues, ...SPECIAL_CARDS];
+    if (!allValues.includes(payload.value)) {
+      return;
+    }
+
+    participant.selectedCard = payload.value;
+    this.server.to(roomId).emit('cardSelected', { sessionId });
+  }
+
+  @SubscribeMessage('reveal')
+  handleReveal(@ConnectedSocket() client: Socket): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.state !== 'voting') {
+      return;
+    }
+
+    const isMaster = room.masterSessionId === sessionId;
+    if (!isMaster && !room.isPublicMode) {
+      return;
+    }
+
+    room.state = 'revealed';
+
+    const votes: Record<string, string | null> = {};
+    for (const p of room.participants.values()) {
+      if (p.selectedCard !== null) {
+        votes[p.sessionId] = p.selectedCard;
+      }
+    }
+
+    const payload: CardsRevealedPayload = { votes };
+    this.server.to(roomId).emit('cardsRevealed', payload);
+  }
+
+  @SubscribeMessage('reset')
+  handleReset(@ConnectedSocket() client: Socket): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.state !== 'revealed') {
+      return;
+    }
+
+    const isMaster = room.masterSessionId === sessionId;
+    if (!isMaster && !room.isPublicMode) {
+      return;
+    }
+
+    for (const p of room.participants.values()) {
+      p.selectedCard = null;
+    }
+    room.state = 'voting';
+
+    this.server.to(roomId).emit('roundReset');
+  }
+
+  private buildRoomState(room: Room): RoomStatePayload {
+    const isRevealed = room.state === 'revealed';
+    const votes: Record<string, string | null> = {};
+
+    const participants: ParticipantPayload[] = [];
+    for (const p of room.participants.values()) {
+      participants.push({
+        sessionId: p.sessionId,
+        name: p.name,
+        hasVoted: p.selectedCard !== null,
+        isConnected: p.socketId !== '',
+      });
+      if (isRevealed && p.selectedCard !== null) {
+        votes[p.sessionId] = p.selectedCard;
+      }
+    }
+
+    return {
+      id: room.id,
+      title: room.title,
+      currentTask: room.currentTask,
+      deck: room.deck,
+      deckValues: room.deckValues,
+      isPublicMode: room.isPublicMode,
+      masterSessionId: room.masterSessionId,
+      state: room.state,
+      participants,
+      votes: isRevealed ? votes : null,
+    };
   }
 }

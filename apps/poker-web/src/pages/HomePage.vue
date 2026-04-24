@@ -1,54 +1,139 @@
 <template>
   <AppLayout>
-    <div class="hero py-24">
-      <div class="hero-content text-center flex-col gap-6">
-        <div class="badge badge-primary badge-outline">daisyUI + Tailwind v4 ✓</div>
-        <h1 class="text-5xl font-extrabold tracking-tight">Poker app is ready.</h1>
-        <p class="text-base-content/60 max-w-md">
-          Vue 3 · Tailwind CSS v4 · daisyUI · Pinia · Vue Router · Vite 8 — all wired up and
-          working.
-        </p>
-        <div class="flex gap-3">
-          <button class="btn btn-primary">Get started</button>
-          <button class="btn btn-ghost">Learn more</button>
-        </div>
-      </div>
-    </div>
+    <div class="home">
+      <div class="home__card">
+        <!-- PS-01: name entry -->
+        <template v-if="!hasName">
+          <h1 class="home__title">Welcome to Poker</h1>
+          <p class="home__subtitle">Enter your display name to get started.</p>
+          <form class="home__form" @submit.prevent="submitName">
+            <Input
+              ref="nameInputRef"
+              v-model="nameInput"
+              placeholder="Your name"
+              :error="nameError"
+            />
+            <Button type="submit" variant="primary" class="home__cta">Continue</Button>
+          </form>
+        </template>
 
-    <div class="max-w-4xl mx-auto px-6 pb-24 grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div
-        v-for="f in features"
-        :key="f.title"
-        class="card bg-base-100 shadow-sm border border-base-300"
-      >
-        <div class="card-body gap-1">
-          <h2 class="card-title text-base">{{ f.title }}</h2>
-          <p class="text-sm text-base-content/60">{{ f.description }}</p>
-        </div>
+        <!-- PS-02: create room -->
+        <template v-else>
+          <h1 class="home__title">Ready to estimate?</h1>
+          <p class="home__subtitle">Create a room and share the link with your team.</p>
+          <form class="home__form" @submit.prevent="createRoom">
+            <Input v-model="roomTitle" placeholder="Room title (optional)" />
+            <Alert v-if="createError" variant="error" :dismissible="true">{{ createError }}</Alert>
+            <Button type="submit" variant="primary" :loading="isCreating" class="home__cta">
+              Create room
+            </Button>
+          </form>
+        </template>
       </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import AppLayout from '@/components/layouts/AppLayout.vue';
+import { Alert, Button, Input } from '@/components/ui';
+import { useSession } from '@/composables/useSession';
+import { roomApi } from '@/api/roomApi';
 
-const features = [
-  {
-    title: 'Vue 3',
-    description: 'Composition API with script setup and full TypeScript support.',
-  },
-  {
-    title: 'Tailwind v4',
-    description: 'Utility-first CSS with zero config — powered by @tailwindcss/vite.',
-  },
-  {
-    title: 'Pinia',
-    description: 'Lightweight, type-safe state management for Vue.',
-  },
-  {
-    title: 'Vite 8',
-    description: 'Lightning-fast dev server and optimized production builds.',
-  },
-];
+const router = useRouter();
+const { name, setName } = useSession();
+
+const hasName = computed(() => name.value.trim().length > 0);
+
+// PS-01 — name entry
+const nameInput = ref(name.value);
+const nameError = ref('');
+const nameInputRef = ref<InstanceType<typeof Input> | null>(null);
+
+onMounted(() => {
+  if (!hasName.value) {
+    nameInputRef.value?.$el.querySelector('input')?.focus();
+  }
+});
+
+function submitName(): void {
+  const trimmed = nameInput.value.trim().slice(0, 32);
+  if (!trimmed) {
+    nameError.value = 'Name cannot be empty.';
+    return;
+  }
+  nameError.value = '';
+  setName(trimmed);
+}
+
+// PS-02 — create room
+const roomTitle = ref('');
+const isCreating = ref(false);
+const createError = ref('');
+
+async function createRoom(): Promise<void> {
+  isCreating.value = true;
+  createError.value = '';
+  try {
+    const res = await roomApi.createRoom({
+      body: { title: roomTitle.value.trim() || undefined },
+    });
+    if (res.status === 201) {
+      await router.push(`/room/${res.body.id}`);
+    } else {
+      createError.value = 'Failed to create room. Please try again.';
+    }
+  } catch {
+    createError.value = 'Network error. Please try again.';
+  } finally {
+    isCreating.value = false;
+  }
+}
 </script>
+
+<style scoped lang="scss">
+.home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 2rem 1rem;
+
+  &__card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--color-base-100);
+    border: 1px solid var(--color-base-300);
+    border-radius: 1rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    text-align: center;
+    color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
+    margin-top: -0.5rem;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__cta {
+    width: 100%;
+  }
+}
+</style>

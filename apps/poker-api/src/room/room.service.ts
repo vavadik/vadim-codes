@@ -3,10 +3,11 @@ import type { DeckName, Participant, Room, RoomState } from '@vadim-codes/poker-
 import { nanoid } from 'nanoid';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Deck values per PS-04; special cards (['?','☕','∞']) are appended client-side.
 const DECK_VALUES: Record<DeckName, string[]> = {
-  fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
-  tshirt: ['XS', 'S', 'M', 'L', 'XL', '?'],
-  powersOfTwo: ['1', '2', '4', '8', '16', '32', '?'],
+  fibonacci: ['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89'],
+  tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+  powersOfTwo: ['1', '2', '4', '8', '16', '32', '64'],
   custom: [],
 };
 
@@ -91,7 +92,8 @@ export class RoomService {
     return room;
   }
 
-  markDisconnected(socketId: string): void {
+  /** Marks a socket as stale. Returns { roomId, sessionId } when a slot was found, null otherwise. */
+  markDisconnected(socketId: string): { roomId: string; sessionId: string } | null {
     for (const room of this.rooms.values()) {
       for (const participant of room.participants.values()) {
         if (participant.socketId === socketId) {
@@ -101,10 +103,11 @@ export class RoomService {
             room.lastActivityAt = new Date();
             this.persistActivity(room.id, room.lastActivityAt);
           }
-          return;
+          return { roomId: room.id, sessionId: participant.sessionId };
         }
       }
     }
+    return null;
   }
 
   private persistActivity(roomId: string, lastActivityAt: Date): void {
