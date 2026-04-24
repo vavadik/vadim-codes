@@ -86,7 +86,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.0
-        version: 11.0.21(@swc/cli@0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21))(chokidar@4.0.3))(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(esbuild@0.27.7)
+        version: 11.0.21(@swc/cli@0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21)))(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(esbuild@0.27.7)
       '@nestjs/schematics':
         specifier: ^11.0.0
         version: 11.0.10(chokidar@4.0.3)(typescript@5.9.2)
@@ -236,6 +236,191 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(typescript@6.0.2)
 
+  apps/poker-api:
+    dependencies:
+      '@nestjs/common':
+        specifier: ^11.0.1
+        version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/config':
+        specifier: ^4.0.4
+        version: 4.0.4(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.0.1
+        version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/jwt':
+        specifier: ^11.0.2
+        version: 11.0.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))
+      '@nestjs/passport':
+        specifier: ^11.0.5
+        version: 11.0.5(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(passport@0.7.0)
+      '@nestjs/platform-express':
+        specifier: ^11.0.1
+        version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)
+      '@nestjs/swagger':
+        specifier: ^11.3.0
+        version: 11.3.0(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)
+      '@ts-rest/core':
+        specifier: 3.53.0-rc.1
+        version: 3.53.0-rc.1(@types/node@22.19.17)
+      '@ts-rest/nest':
+        specifier: 3.53.0-rc.1
+        version: 3.53.0-rc.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@ts-rest/core@3.53.0-rc.1(@types/node@22.19.17))(rxjs@7.8.2)
+      '@vadim-codes/poker-contracts':
+        specifier: workspace:*
+        version: link:../../packages/poker-contracts
+      '@vadim-codes/poker-db':
+        specifier: workspace:*
+        version: link:../../packages/poker-db
+      cookie-parser:
+        specifier: ^1.4.7
+        version: 1.4.7
+      passport:
+        specifier: ^0.7.0
+        version: 0.7.0
+      passport-oauth2:
+        specifier: ^1.8.0
+        version: 1.8.0
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@nestjs/cli':
+        specifier: ^11.0.0
+        version: 11.0.21(@swc/cli@0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21)))(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(esbuild@0.27.7)
+      '@nestjs/schematics':
+        specifier: ^11.0.0
+        version: 11.0.10(chokidar@4.0.3)(typescript@5.9.2)
+      '@nestjs/testing':
+        specifier: ^11.0.1
+        version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/platform-express@11.1.19)
+      '@swc/cli':
+        specifier: ^0.8.1
+        version: 0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: ^1.15.26
+        version: 1.15.26(@swc/helpers@0.5.21)
+      '@types/cookie-parser':
+        specifier: ^1.4.10
+        version: 1.4.10(@types/express@5.0.6)
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/node':
+        specifier: ^22.10.7
+        version: 22.19.17
+      '@types/passport':
+        specifier: ^1.0.17
+        version: 1.0.17
+      '@types/passport-oauth2':
+        specifier: ^1.8.0
+        version: 1.8.0
+      '@types/supertest':
+        specifier: ^6.0.2
+        version: 6.0.3
+      '@vitest/coverage-v8':
+        specifier: ^4.1.4
+        version: 4.1.4(vitest@4.1.4)
+      globals:
+        specifier: ^16.0.0
+        version: 16.5.0
+      source-map-support:
+        specifier: ^0.5.21
+        version: 0.5.21
+      supertest:
+        specifier: ^7.0.0
+        version: 7.2.2
+      ts-loader:
+        specifier: ^9.5.2
+        version: 9.5.7(typescript@5.9.2)(webpack@5.106.0(@swc/core@1.15.26(@swc/helpers@0.5.21))(esbuild@0.27.7))
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(typescript@5.9.2)
+      tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.2.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.2
+      unplugin-swc:
+        specifier: ^1.5.9
+        version: 1.5.9(@swc/core@1.15.26(@swc/helpers@0.5.21))(rollup@4.60.1)
+      vitest:
+        specifier: ^4.1.4
+        version: 4.1.4(@types/node@22.19.17)(@vitest/coverage-v8@4.1.4)(jsdom@29.0.2(@noble/hashes@1.8.0))(vite@8.0.8(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+
+  apps/poker-web:
+    dependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.2.2
+        version: 4.2.2(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+      '@ts-rest/core':
+        specifier: 3.53.0-rc.1
+        version: 3.53.0-rc.1(@types/node@24.12.2)
+      '@vadim-codes/poker-contracts':
+        specifier: workspace:*
+        version: link:../../packages/poker-contracts
+      pinia:
+        specifier: ^3.0.4
+        version: 3.0.4(typescript@6.0.2)(vue@3.5.32(typescript@6.0.2))
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.2.2
+      vue:
+        specifier: ^3.5.31
+        version: 3.5.32(typescript@6.0.2)
+      vue-router:
+        specifier: ^5.0.4
+        version: 5.0.4(@vue/compiler-sfc@3.5.32)(pinia@3.0.4(typescript@6.0.2)(vue@3.5.32(typescript@6.0.2)))(vue@3.5.32(typescript@6.0.2))
+    devDependencies:
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/jsdom':
+        specifier: ^28.0.1
+        version: 28.0.1
+      '@types/node':
+        specifier: ^24.12.0
+        version: 24.12.2
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.5
+        version: 6.0.6(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.32(typescript@6.0.2))
+      '@vue/test-utils':
+        specifier: ^2.4.6
+        version: 2.4.6
+      '@vue/tsconfig':
+        specifier: ^0.9.1
+        version: 0.9.1(typescript@6.0.2)(vue@3.5.32(typescript@6.0.2))
+      daisyui:
+        specifier: ^5.5.19
+        version: 5.5.19
+      jsdom:
+        specifier: ^29.0.1
+        version: 29.0.2(@noble/hashes@1.8.0)
+      npm-run-all2:
+        specifier: ^8.0.4
+        version: 8.0.4
+      sass-embedded:
+        specifier: ^1.99.0
+        version: 1.99.0
+      typescript:
+        specifier: ~6.0.0
+        version: 6.0.2
+      vite:
+        specifier: ^8.0.3
+        version: 8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+      vite-plugin-vue-devtools:
+        specifier: ^8.1.1
+        version: 8.1.1(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.32(typescript@6.0.2))
+      vitest:
+        specifier: ^4.1.2
+        version: 4.1.4(@types/node@24.12.2)(@vitest/coverage-v8@4.1.4)(jsdom@29.0.2(@noble/hashes@1.8.0))(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+      vue-tsc:
+        specifier: ^3.2.6
+        version: 3.2.6(typescript@6.0.2)
+
   packages/composer-ai-contracts:
     dependencies:
       '@openapi-contrib/json-schema-to-openapi-schema':
@@ -259,6 +444,62 @@ importers:
         version: 5.9.2
 
   packages/composer-ai-db:
+    dependencies:
+      '@prisma/adapter-pg':
+        specifier: ^7.7.0
+        version: 7.7.0
+      '@prisma/client':
+        specifier: ^7.7.0
+        version: 7.7.0(prisma@7.7.0(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.2))(typescript@5.9.2)
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      pg:
+        specifier: ^8.20.0
+        version: 8.20.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
+      prisma:
+        specifier: ^7.7.0
+        version: 7.7.0(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.2)
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(@swc/core@1.15.26(@swc/helpers@0.5.21))(jiti@2.6.1)(postcss@8.5.10)(tsx@4.21.0)(typescript@5.9.2)(yaml@2.8.3)
+      tsx:
+        specifier: ^4.0.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.2
+
+  packages/poker-contracts:
+    dependencies:
+      '@openapi-contrib/json-schema-to-openapi-schema':
+        specifier: ^4.3.2
+        version: 4.3.2(@types/json-schema@7.0.15)(openapi-types@12.1.3)
+      '@ts-rest/core':
+        specifier: 3.53.0-rc.1
+        version: 3.53.0-rc.1(@types/node@22.19.17)
+      '@ts-rest/open-api':
+        specifier: 3.53.0-rc.1
+        version: 3.53.0-rc.1(@ts-rest/core@3.53.0-rc.1(@types/node@22.19.17))(zod@4.3.6)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.2
+
+  packages/poker-db:
     dependencies:
       '@prisma/adapter-pg':
         specifier: ^7.7.0
@@ -7541,7 +7782,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@nestjs/cli@11.0.21(@swc/cli@0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21))(chokidar@4.0.3))(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(esbuild@0.27.7)':
+  '@nestjs/cli@11.0.21(@swc/cli@0.8.1(@swc/core@1.15.26(@swc/helpers@0.5.21)))(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@22.19.17)(esbuild@0.27.7)':
     dependencies:
       '@angular-devkit/core': 19.2.24(chokidar@4.0.3)
       '@angular-devkit/schematics': 19.2.24(chokidar@4.0.3)

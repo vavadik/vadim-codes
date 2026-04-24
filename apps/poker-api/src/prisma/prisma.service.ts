@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { createPrismaClient, PrismaClient } from '@vadim-codes/db';
+import { createPrismaClient, PrismaClient } from '@vadim-codes/poker-db';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
@@ -7,12 +7,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     const baseUrl = process.env['DATABASE_URL'];
-    const dbName = process.env['COMPOSER_AI_DB_NAME'];
+    const dbName = process.env['POKER_DB_NAME'];
     if (!baseUrl) {
       throw new Error('DATABASE_URL is not set');
     }
     if (!dbName) {
-      throw new Error('COMPOSER_AI_DB_NAME is not set');
+      throw new Error('POKER_DB_NAME is not set');
     }
     this.client = createPrismaClient(`${baseUrl}/${dbName}`);
   }
