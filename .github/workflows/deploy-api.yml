@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths:
       - 'apps/composer-ai-api/**'
-      - 'packages/**'
+      - 'packages/composer-ai-db/**'
+      - 'packages/composer-ai-contracts/**'
   workflow_dispatch:
 
 jobs:
