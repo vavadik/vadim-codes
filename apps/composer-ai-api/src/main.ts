@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
-import { generateOpenApiDocument } from '@vadim-codes/contracts';
+import { generateOpenApiDocument } from '@vadim-codes/composer-ai-contracts';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 

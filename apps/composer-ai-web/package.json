@@ -18,7 +18,7 @@
     "@pdfme/ui": "^6.0.6",
     "@tailwindcss/vite": "^4.2.2",
     "@ts-rest/core": "3.53.0-rc.1",
-    "@vadim-codes/contracts": "workspace:*",
+    "@vadim-codes/composer-ai-contracts": "workspace:*",
     "nanoid": "^5.1.9",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.2.2",

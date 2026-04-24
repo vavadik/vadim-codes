@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { apiClient } from '@/composables/useApiClient';
-import type { SfSObjectSummary, SfSObjectDescribe } from '@vadim-codes/contracts';
+import type { SfSObjectSummary, SfSObjectDescribe } from '@vadim-codes/composer-ai-contracts';
 
 export const useSalesforceStore = defineStore('salesforce', () => {
   const sobjects = ref<SfSObjectSummary[]>([]);

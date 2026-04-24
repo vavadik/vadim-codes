@@ -75,7 +75,7 @@ pnpm exec prisma migrate dev
 
 ## How apps/api Uses This Package
 
-`apps/api/src/prisma/prisma.service.ts` imports `createPrismaClient` from `@vadim-codes/db` and wraps it as a NestJS injectable service. All database access goes through `PrismaService` — never import PrismaClient directly in feature modules.
+`apps/api/src/prisma/prisma.service.ts` imports `createPrismaClient` from `@vadim-codes/composer-ai-db` and wraps it as a NestJS injectable service. All database access goes through `PrismaService` — never import PrismaClient directly in feature modules.
 
 ## Notes
 

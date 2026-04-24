@@ -1,6 +1,6 @@
 import { Controller, Req, UseGuards } from '@nestjs/common';
 import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
-import { contract } from '@vadim-codes/contracts';
+import { contract } from '@vadim-codes/composer-ai-contracts';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SalesforceService } from './salesforce.service';

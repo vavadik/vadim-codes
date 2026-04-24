@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { createPrismaClient, PrismaClient } from '@vadim-codes/db';
+import { createPrismaClient, PrismaClient } from '@vadim-codes/composer-ai-db';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {

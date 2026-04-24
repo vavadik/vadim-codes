@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { apiClient } from '@/composables/useApiClient';
-import type { TodoDto } from '@vadim-codes/contracts';
+import type { TodoDto } from '@vadim-codes/composer-ai-contracts';
 
 export const useTodoStore = defineStore('todo', () => {
   const todos = ref<TodoDto[]>([]);

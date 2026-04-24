@@ -1,5 +1,5 @@
 {
-  "name": "@vadim-codes/db",
+  "name": "@vadim-codes/composer-ai-db",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",

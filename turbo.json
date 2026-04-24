@@ -26,8 +26,26 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev": {
-      "dependsOn": ["@vadim-codes/contracts#build", "@vadim-codes/db#build"],
+    "composer-ai-api#dev": {
+      "dependsOn": [
+        "@vadim-codes/composer-ai-contracts#build",
+        "@vadim-codes/composer-ai-db#build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "composer-ai-web#dev": {
+      "dependsOn": ["@vadim-codes/composer-ai-contracts#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "poker-api#dev": {
+      "dependsOn": ["@vadim-codes/poker-contracts#build", "@vadim-codes/poker-db#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "poker-web#dev": {
+      "dependsOn": ["@vadim-codes/poker-contracts#build"],
       "cache": false,
       "persistent": true
     },

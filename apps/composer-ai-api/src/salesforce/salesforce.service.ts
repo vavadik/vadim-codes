@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Connection } from 'jsforce';
-import type { SfDescribeGlobal, SfRecord, SfSObjectDescribe } from '@vadim-codes/contracts';
+import type {
+  SfDescribeGlobal,
+  SfRecord,
+  SfSObjectDescribe,
+} from '@vadim-codes/composer-ai-contracts';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

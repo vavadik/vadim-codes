@@ -59,10 +59,10 @@ importers:
       '@ts-rest/nest':
         specifier: 3.53.0-rc.1
         version: 3.53.0-rc.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@ts-rest/core@3.53.0-rc.1(@types/node@22.19.17))(rxjs@7.8.2)
-      '@vadim-codes/contracts':
+      '@vadim-codes/composer-ai-contracts':
         specifier: workspace:*
         version: link:../../packages/composer-ai-contracts
-      '@vadim-codes/db':
+      '@vadim-codes/composer-ai-db':
         specifier: workspace:*
         version: link:../../packages/composer-ai-db
       cookie-parser:
@@ -168,7 +168,7 @@ importers:
       '@ts-rest/core':
         specifier: 3.53.0-rc.1
         version: 3.53.0-rc.1(@types/node@24.12.2)
-      '@vadim-codes/contracts':
+      '@vadim-codes/composer-ai-contracts':
         specifier: workspace:*
         version: link:../../packages/composer-ai-contracts
       nanoid:

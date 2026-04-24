@@ -11,7 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@vadim-codes/contracts': fileURLToPath(
+      '@vadim-codes/composer-ai-contracts': fileURLToPath(
         new URL('../../packages/composer-ai-contracts/src/index.ts', import.meta.url)
       ),
     },

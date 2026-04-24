@@ -1,5 +1,5 @@
 {
-  "name": "@vadim-codes/contracts",
+  "name": "@vadim-codes/composer-ai-contracts",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",

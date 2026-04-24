@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
-import { contract } from '@vadim-codes/contracts';
+import { contract } from '@vadim-codes/composer-ai-contracts';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller()

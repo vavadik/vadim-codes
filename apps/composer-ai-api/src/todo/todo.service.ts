@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import type { TodoDto, CreateTodoDto, UpdateTodoDto } from '@vadim-codes/contracts';
+import type { TodoDto, CreateTodoDto, UpdateTodoDto } from '@vadim-codes/composer-ai-contracts';
 
 @Injectable()
 export class TodoService {
