@@ -24,4 +24,3 @@ jobs:
             git pull origin main
             pnpm install --frozen-lockfile
             pnpm turbo run build --filter=composer-ai-web...
-            rsync -av --delete apps/composer-ai-web/dist/ ${{ secrets.VPS_WEB_DIST_PATH }}/
