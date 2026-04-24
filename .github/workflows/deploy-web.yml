@@ -20,6 +20,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
+            source ~/.bashrc
             cd ${{ secrets.VPS_REPO_PATH }}
             git pull origin main
             pnpm install --frozen-lockfile
