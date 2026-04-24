@@ -110,6 +110,27 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  function masterChanged(sessionId: string): void {
+    if (!room.value) {
+      return;
+    }
+    room.value.masterSessionId = sessionId;
+  }
+
+  function publicModeChanged(enabled: boolean): void {
+    if (!room.value) {
+      return;
+    }
+    room.value.isPublicMode = enabled;
+  }
+
+  function titleUpdated(title: string): void {
+    if (!room.value) {
+      return;
+    }
+    room.value.title = title;
+  }
+
   function clear(): void {
     room.value = null;
     error.value = null;
@@ -131,6 +152,9 @@ export const useRoomStore = defineStore('room', () => {
     taskUpdated,
     deckChanged,
     roundReset,
+    masterChanged,
+    publicModeChanged,
+    titleUpdated,
     clear,
   };
 });

@@ -21,9 +21,13 @@ export const roomContract = c.router({
   deleteRoom: {
     method: 'DELETE',
     path: '/rooms/:id',
+    pathParams: z.object({ id: z.string() }),
+    headers: z.object({ 'x-session-id': z.string() }),
     body: z.undefined(),
     responses: {
       204: z.undefined(),
+      403: z.object({ message: z.string() }),
+      404: z.object({ message: z.string() }),
     },
   },
 });

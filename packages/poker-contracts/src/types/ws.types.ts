@@ -81,3 +81,33 @@ export interface DeckChangedPayload {
   deck: DeckName;
   deckValues: string[];
 }
+
+// ── PS-11: Transfer master ───────────────────────────────────────────────────
+
+export interface TransferMasterPayload {
+  sessionId: string;
+}
+
+export interface MasterChangedPayload {
+  sessionId: string;
+}
+
+// ── PS-12: Public mode ───────────────────────────────────────────────────────
+
+export interface TogglePublicModePayload {
+  enabled: boolean;
+}
+
+export interface PublicModeChangedPayload {
+  enabled: boolean;
+}
+
+// ── PS-13: Room title ────────────────────────────────────────────────────────
+
+export interface SetTitlePayload {
+  title: string;
+}
+
+export interface TitleUpdatedPayload {
+  title: string;
+}

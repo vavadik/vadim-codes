@@ -12,14 +12,20 @@ import type {
   CardsRevealedPayload,
   DeckChangedPayload,
   JoinPayload,
+  MasterChangedPayload,
   ParticipantPayload,
   ParticipantReconnectedPayload,
+  PublicModeChangedPayload,
   Room,
   RoomStatePayload,
   SelectCardPayload,
   SetDeckPayload,
   SetTaskPayload,
+  SetTitlePayload,
   TaskUpdatedPayload,
+  TitleUpdatedPayload,
+  TogglePublicModePayload,
+  TransferMasterPayload,
 } from '@vadim-codes/poker-contracts';
 import { RoomService } from './room.service';
 
@@ -178,6 +184,69 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomId).emit('cardsRevealed', payload);
   }
 
+  @SubscribeMessage('transferMaster')
+  handleTransferMaster(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: TransferMasterPayload
+  ): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId || payload.sessionId === sessionId) {
+      return;
+    }
+    const updated = this.roomService.transferMaster(roomId, payload.sessionId);
+    if (!updated) {
+      return;
+    }
+    const response: MasterChangedPayload = { sessionId: payload.sessionId };
+    this.server.to(roomId).emit('masterChanged', response);
+  }
+
+  @SubscribeMessage('togglePublicMode')
+  handleTogglePublicMode(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: TogglePublicModePayload
+  ): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId) {
+      return;
+    }
+    const updated = this.roomService.setPublicMode(roomId, payload.enabled);
+    if (!updated) {
+      return;
+    }
+    const response: PublicModeChangedPayload = { enabled: updated.isPublicMode };
+    this.server.to(roomId).emit('publicModeChanged', response);
+  }
+
+  @SubscribeMessage('setTitle')
+  handleSetTitle(@ConnectedSocket() client: Socket, @MessageBody() payload: SetTitlePayload): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const room = this.roomService.getRoom(roomId);
+    if (!room || room.masterSessionId !== sessionId) {
+      return;
+    }
+    const updated = this.roomService.setTitle(roomId, payload.title);
+    if (!updated) {
+      return;
+    }
+    const response: TitleUpdatedPayload = { title: updated.title };
+    this.server.to(roomId).emit('titleUpdated', response);
+  }
+
   @SubscribeMessage('setTask')
   handleSetTask(@ConnectedSocket() client: Socket, @MessageBody() payload: SetTaskPayload): void {
     const meta = this.socketMeta.get(client.id);
@@ -186,7 +255,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const { roomId, sessionId } = meta;
     const room = this.roomService.getRoom(roomId);
-    if (!room || room.masterSessionId !== sessionId) {
+    if (!room || (room.masterSessionId !== sessionId && !room.isPublicMode)) {
       return;
     }
     this.roomService.setTask(roomId, payload.task);

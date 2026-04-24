@@ -49,13 +49,13 @@ After this phase: vote visibility, task context, results analytics, and deck fle
 
 After this phase: facilitators have full control; rooms clean themselves up.
 
-| #     | Story                                                       | Status | Notes                                                  |
-| ----- | ----------------------------------------------------------- | ------ | ------------------------------------------------------ |
-| PS-11 | [Transfer master role](stories/PS-11-transfer-master.md)    | ⬜     | Crown handoff; leaderless state if master session lost |
-| PS-12 | [Public mode](stories/PS-12-public-mode.md)                 | ⬜     | Everyone can reveal/reset                              |
-| PS-13 | [Room settings modal](stories/PS-13-room-settings-modal.md) | ⬜     | Title, invite link, participants, danger zone          |
-| PS-14 | [Room auto-expiry (TTL)](stories/PS-14-room-ttl.md)         | ⬜     | Cron cleanup after 24 h inactivity                     |
-| PS-18 | [My rooms panel](stories/PS-18-my-rooms.md)                 | ⬜     | Owned + recent rooms on home page                      |
+| #     | Story                                                       | Status | Notes                                                                  |
+| ----- | ----------------------------------------------------------- | ------ | ---------------------------------------------------------------------- |
+| PS-11 | [Transfer master role](stories/PS-11-transfer-master.md)    | ✅     | transferMaster WS event; leaderless badge in header                    |
+| PS-12 | [Public mode](stories/PS-12-public-mode.md)                 | ✅     | togglePublicMode WS event; Public badge in header                      |
+| PS-13 | [Room settings modal](stories/PS-13-room-settings-modal.md) | ✅     | Gear icon → RoomSettingsModal (title, deck, participants, danger zone) |
+| PS-14 | [Room auto-expiry (TTL)](stories/PS-14-room-ttl.md)         | ✅     | @nestjs/schedule cron every 30 min; RoomScheduler                      |
+| PS-18 | [My rooms panel](stories/PS-18-my-rooms.md)                 | ✅     | MyRoomsPanel on home page; owned + recent sections                     |
 
 ---
 

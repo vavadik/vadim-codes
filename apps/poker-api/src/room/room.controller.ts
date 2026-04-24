@@ -20,7 +20,14 @@ export class RoomController {
 
   @TsRestHandler(contract.room.deleteRoom)
   deleteRoom() {
-    return tsRestHandler(contract.room.deleteRoom, async ({ params }) => {
+    return tsRestHandler(contract.room.deleteRoom, async ({ params, headers }) => {
+      const room = this.roomService.getRoom(params.id);
+      if (!room) {
+        return { status: 404 as const, body: { message: 'Room not found' } };
+      }
+      if (room.masterSessionId !== headers['x-session-id']) {
+        return { status: 403 as const, body: { message: 'Forbidden' } };
+      }
       await this.roomService.deleteRoom(params.id);
       return { status: 204 as const, body: undefined };
     });

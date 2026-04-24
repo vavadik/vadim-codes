@@ -3,13 +3,16 @@ import { io, type Socket } from 'socket.io-client';
 import type {
   CardsRevealedPayload,
   DeckChangedPayload,
+  MasterChangedPayload,
   ParticipantJoinedPayload,
   ParticipantDisconnectedPayload,
   ParticipantReconnectedPayload,
   ParticipantLeftPayload,
   CardSelectedPayload,
+  PublicModeChangedPayload,
   RoomStatePayload,
   TaskUpdatedPayload,
+  TitleUpdatedPayload,
 } from '@vadim-codes/poker-contracts';
 import { useSession } from './useSession';
 import { useRoomStore } from '@/stores/room';
@@ -17,7 +20,7 @@ import { useRoomStore } from '@/stores/room';
 const API_URL = import.meta.env.VITE_API_URL ?? window.location.origin;
 
 export function useRoom(roomId: string) {
-  const { sessionId, name, addRoom } = useSession();
+  const { sessionId, name, addRoom, removeRoom } = useSession();
   const store = useRoomStore();
 
   let socket: Socket | null = null;
@@ -43,6 +46,19 @@ export function useRoom(roomId: string) {
     socket.on('roomNotFound', () => {
       store.isConnecting = false;
       store.setError('Room not found.');
+      removeRoom(roomId);
+    });
+
+    socket.on('masterChanged', ({ sessionId: sid }: MasterChangedPayload) => {
+      store.masterChanged(sid);
+    });
+
+    socket.on('publicModeChanged', ({ enabled }: PublicModeChangedPayload) => {
+      store.publicModeChanged(enabled);
+    });
+
+    socket.on('titleUpdated', ({ title }: TitleUpdatedPayload) => {
+      store.titleUpdated(title);
     });
 
     socket.on('participantJoined', ({ participant }: ParticipantJoinedPayload) => {
@@ -106,6 +122,18 @@ export function useRoom(roomId: string) {
     socket?.emit('setDeck', { deck, deckValues });
   }
 
+  function transferMaster(targetSessionId: string): void {
+    socket?.emit('transferMaster', { sessionId: targetSessionId });
+  }
+
+  function togglePublicMode(enabled: boolean): void {
+    socket?.emit('togglePublicMode', { enabled });
+  }
+
+  function setTitle(title: string): void {
+    socket?.emit('setTitle', { title });
+  }
+
   onMounted(() => {
     store.clear();
     if (name.value) {
@@ -125,5 +153,15 @@ export function useRoom(roomId: string) {
     socket = null;
   });
 
-  return { store, selectCard, reveal, reset, setTask, setDeck };
+  return {
+    store,
+    selectCard,
+    reveal,
+    reset,
+    setTask,
+    setDeck,
+    transferMaster,
+    togglePublicMode,
+    setTitle,
+  };
 }

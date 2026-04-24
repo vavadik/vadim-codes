@@ -92,6 +92,39 @@ export class RoomService {
     return room;
   }
 
+  transferMaster(roomId: string, newSessionId: string): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room || !room.participants.has(newSessionId)) {
+      return undefined;
+    }
+    room.masterSessionId = newSessionId;
+    return room;
+  }
+
+  setPublicMode(roomId: string, enabled: boolean): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return undefined;
+    }
+    room.isPublicMode = enabled;
+    this.prisma.db.room
+      .updateMany({ where: { id: roomId }, data: { isPublicMode: enabled } })
+      .catch((err) => console.error('Failed to persist isPublicMode for room', roomId, err));
+    return room;
+  }
+
+  setTitle(roomId: string, title: string): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return undefined;
+    }
+    room.title = title.slice(0, 100);
+    this.prisma.db.room
+      .updateMany({ where: { id: roomId }, data: { title: room.title } })
+      .catch((err) => console.error('Failed to persist title for room', roomId, err));
+    return room;
+  }
+
   setTask(roomId: string, task: string): Room | undefined {
     const room = this.rooms.get(roomId);
     if (!room) {
@@ -143,6 +176,24 @@ export class RoomService {
       }
     }
     return null;
+  }
+
+  async expireStaleRooms(): Promise<void> {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const stale = await this.prisma.db.room.findMany({
+      where: { lastActivityAt: { lt: cutoff } },
+    });
+    for (const dbRoom of stale) {
+      const memRoom = this.rooms.get(dbRoom.id);
+      if (memRoom) {
+        const hasLive = [...memRoom.participants.values()].some((p) => p.socketId !== '');
+        if (hasLive) {
+          continue;
+        }
+        this.rooms.delete(dbRoom.id);
+      }
+      await this.prisma.db.room.deleteMany({ where: { id: dbRoom.id } });
+    }
   }
 
   private persistActivity(roomId: string, lastActivityAt: Date): void {

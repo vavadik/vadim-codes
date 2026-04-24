@@ -1,6 +1,7 @@
 <template>
   <AppLayout>
     <div class="home">
+      <MyRoomsPanel v-if="rooms.length > 0" />
       <div class="home__card">
         <!-- PS-01: name entry -->
         <template v-if="!hasName">
@@ -39,11 +40,12 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppLayout from '@/components/layouts/AppLayout.vue';
 import { Alert, Button, Input } from '@/components/ui';
+import MyRoomsPanel from '@/components/home/MyRoomsPanel.vue';
 import { useSession } from '@/composables/useSession';
 import { roomApi } from '@/api/roomApi';
 
 const router = useRouter();
-const { name, setName } = useSession();
+const { name, setName, rooms } = useSession();
 
 const hasName = computed(() => name.value.trim().length > 0);
 
@@ -96,10 +98,13 @@ async function createRoom(): Promise<void> {
 <style scoped lang="scss">
 .home {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
   min-height: calc(100vh - 64px);
   padding: 2rem 1rem;
+  align-content: center;
 
   &__card {
     width: 100%;

@@ -17,4 +17,10 @@ export type {
   TaskUpdatedPayload,
   SetDeckPayload,
   DeckChangedPayload,
+  TransferMasterPayload,
+  MasterChangedPayload,
+  TogglePublicModePayload,
+  PublicModeChangedPayload,
+  SetTitlePayload,
+  TitleUpdatedPayload,
 } from './types/ws.types';
