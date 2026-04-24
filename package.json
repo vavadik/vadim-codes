@@ -4,15 +4,17 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
-    "dev": "turbo run dev",
+    "dev": "pnpm select dev",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt --check",
     "format:fix": "oxfmt .",
     "check-types": "turbo run check-types",
-    "prepare": "husky"
+    "prepare": "husky",
+    "select": "node scripts/select-run.mjs"
   },
   "devDependencies": {
+    "@inquirer/prompts": "^8.4.2",
     "husky": "^9.1.7",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",

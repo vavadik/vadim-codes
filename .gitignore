@@ -36,3 +36,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# select-run CLI state
+scripts/.select-run-state.json
