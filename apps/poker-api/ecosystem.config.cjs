@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'composer-ai-api',
+      name: 'poker-api',
       script: 'dist/main.js',
       cwd: __dirname,
       instances: 1,

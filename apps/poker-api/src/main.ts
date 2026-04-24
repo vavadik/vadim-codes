@@ -12,6 +12,6 @@ async function bootstrap() {
   const document = await generateOpenApiDocument();
   SwaggerModule.setup('swagger', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.POKER_API_PORT ?? 3001);
 }
 bootstrap();
