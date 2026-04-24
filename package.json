@@ -1,5 +1,5 @@
 {
-  "name": "composer-ai",
+  "name": "vadim-codes",
   "private": true,
   "scripts": {
     "build": "turbo run build",

@@ -27,7 +27,7 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
-      "dependsOn": ["@composer-ai/contracts#build", "@composer-ai/db#build"],
+      "dependsOn": ["@vadim-codes/contracts#build", "@vadim-codes/db#build"],
       "cache": false,
       "persistent": true
     },
