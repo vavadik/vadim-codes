@@ -28,4 +28,4 @@ jobs:
             pnpm install --frozen-lockfile
             pnpm turbo run build --filter=composer-ai-api...
             pnpm --filter=composer-ai-db migrate:deploy
-            pm2 reload ecosystem.config.cjs --only composer-ai-api --update-env
+            pm2 reload apps/composer-ai-api/ecosystem.config.cjs --only composer-ai-api --update-env
