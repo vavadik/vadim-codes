@@ -27,8 +27,8 @@ jobs:
       poker-api: ${{ steps.filter.outputs.poker-api }}
       poker-web: ${{ steps.filter.outputs.poker-web }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
