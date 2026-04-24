@@ -6,3 +6,12 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Room {
+  id             String   @id
+  title          String   @default("")
+  deck           String   @default("fibonacci")
+  isPublicMode   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  lastActivityAt DateTime @default(now())
+}
