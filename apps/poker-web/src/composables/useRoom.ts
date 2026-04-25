@@ -6,6 +6,7 @@ import type {
   MasterChangedPayload,
   ParticipantJoinedPayload,
   ParticipantDisconnectedPayload,
+  ParticipantRenamedPayload,
   ParticipantReconnectedPayload,
   ParticipantLeftPayload,
   CardSelectedPayload,
@@ -101,8 +102,25 @@ export function useRoom(roomId: string) {
       store.deckChanged(payload);
     });
 
+    socket.on(
+      'participantRenamed',
+      ({ sessionId: sid, name: newName }: ParticipantRenamedPayload) => {
+        store.participantRenamed(sid, newName);
+      }
+    );
+
     socket.on('disconnect', () => {
       store.participantDisconnected(sessionId);
+    });
+
+    let hasJoined = false;
+    socket.on('connect', () => {
+      hasJoined = true;
+    });
+    watch(name, (newName) => {
+      if (newName && hasJoined && socket?.connected) {
+        socket.emit('renameSelf', { name: newName });
+      }
     });
   }
 
@@ -165,6 +183,10 @@ export function useRoom(roomId: string) {
     socket = null;
   });
 
+  function renameSelf(newName: string): void {
+    socket?.emit('renameSelf', { name: newName });
+  }
+
   return {
     store,
     selectCard,
@@ -177,5 +199,6 @@ export function useRoom(roomId: string) {
     togglePublicMode,
     setTitle,
     kickParticipant,
+    renameSelf,
   };
 }

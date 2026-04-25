@@ -211,6 +211,19 @@ export class RoomService {
     return room;
   }
 
+  renameParticipant(roomId: string, sessionId: string, name: string): Room | undefined {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return undefined;
+    }
+    const participant = room.participants.get(sessionId);
+    if (!participant) {
+      return undefined;
+    }
+    participant.name = name.slice(0, 32);
+    return room;
+  }
+
   /** Marks a socket as stale. Returns { roomId, sessionId } when a slot was found, null otherwise. */
   markDisconnected(socketId: string): { roomId: string; sessionId: string } | null {
     for (const room of this.rooms.values()) {

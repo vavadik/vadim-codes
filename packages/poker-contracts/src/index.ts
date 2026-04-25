@@ -24,4 +24,6 @@ export type {
   SetTitlePayload,
   TitleUpdatedPayload,
   KickParticipantPayload,
+  RenameSelfPayload,
+  ParticipantRenamedPayload,
 } from './types/ws.types';

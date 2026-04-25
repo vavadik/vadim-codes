@@ -134,6 +134,16 @@ export const useRoomStore = defineStore('room', () => {
     room.value.isPublicMode = enabled;
   }
 
+  function participantRenamed(sessionId: string, name: string): void {
+    if (!room.value) {
+      return;
+    }
+    const p = room.value.participants.find((p) => p.sessionId === sessionId);
+    if (p) {
+      p.name = name;
+    }
+  }
+
   function titleUpdated(title: string): void {
     if (!room.value) {
       return;
@@ -165,6 +175,7 @@ export const useRoomStore = defineStore('room', () => {
     roundReset,
     masterChanged,
     publicModeChanged,
+    participantRenamed,
     titleUpdated,
     clear,
   };

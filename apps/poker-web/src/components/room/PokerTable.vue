@@ -1,8 +1,6 @@
 <template>
   <div ref="tableEl" class="poker-table" :class="{ 'poker-table--compact': compact }">
-    <div class="poker-table__felt">
-      <span v-if="currentTask && !compact" class="poker-table__task">{{ currentTask }}</span>
-    </div>
+    <div class="poker-table__felt"></div>
 
     <div class="poker-table__seats">
       <div

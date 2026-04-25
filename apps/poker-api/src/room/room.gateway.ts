@@ -15,8 +15,10 @@ import type {
   KickParticipantPayload,
   MasterChangedPayload,
   ParticipantPayload,
+  ParticipantRenamedPayload,
   ParticipantReconnectedPayload,
   PublicModeChangedPayload,
+  RenameSelfPayload,
   Room,
   RoomStatePayload,
   SelectCardPayload,
@@ -91,6 +93,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (isReconnect) {
       await this.roomService.reconnectParticipant(roomId, sessionId, client.id);
+      const participant = room.participants.get(sessionId)!;
+      const trimmedName = name.trim().slice(0, 32);
+      if (trimmedName && trimmedName !== participant.name) {
+        participant.name = trimmedName;
+        const renamedPayload: ParticipantRenamedPayload = { sessionId, name: trimmedName };
+        client.to(roomId).emit('participantRenamed', renamedPayload);
+      }
       // Tell everyone else this participant is back online
       const reconnectedPayload: ParticipantReconnectedPayload = { sessionId };
       client.to(roomId).emit('participantReconnected', reconnectedPayload);
@@ -368,6 +377,29 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     room.state = 'voting';
 
     this.server.to(roomId).emit('roundReset');
+  }
+
+  @SubscribeMessage('renameSelf')
+  async handleRenameSelf(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: RenameSelfPayload
+  ): Promise<void> {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    const trimmedName = payload.name?.trim();
+    if (!trimmedName) {
+      return;
+    }
+    const updated = this.roomService.renameParticipant(roomId, sessionId, trimmedName);
+    if (!updated) {
+      return;
+    }
+    const participant = updated.participants.get(sessionId)!;
+    const response: ParticipantRenamedPayload = { sessionId, name: participant.name };
+    this.server.to(roomId).emit('participantRenamed', response);
   }
 
   private buildRoomState(room: Room): RoomStatePayload {

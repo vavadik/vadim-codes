@@ -117,3 +117,14 @@ export interface TitleUpdatedPayload {
 export interface KickParticipantPayload {
   sessionId: string;
 }
+
+// ── Rename self ───────────────────────────────────────────────────────────────
+
+export interface RenameSelfPayload {
+  name: string;
+}
+
+export interface ParticipantRenamedPayload {
+  sessionId: string;
+  name: string;
+}
