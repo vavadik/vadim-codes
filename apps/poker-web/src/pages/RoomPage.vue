@@ -18,6 +18,7 @@
           v-if="store.room.state === 'revealed' && store.room.votes"
           :votes="store.room.votes"
           :participants="store.room.participants"
+          class="room__results-summary"
         />
 
         <RoomHeader
@@ -31,22 +32,15 @@
           :set-title="setTitle"
           :set-deck="setDeck"
           :set-task="setTask"
+          class="room__header"
         />
 
-        <div class="room__participants">
-          <PlayerSeat
-            v-for="p in store.room.participants"
-            :key="p.sessionId"
-            :name="p.name"
-            :card-state="seatCardState(p)"
-            :card-value="store.room.votes?.[p.sessionId] ?? undefined"
-            :is-master="p.sessionId === store.room.masterSessionId"
-            :is-connected="p.isConnected"
-            :on-kick="
-              isMaster && p.sessionId !== sessionId ? () => kickParticipant(p.sessionId) : undefined
-            "
-          />
-        </div>
+        <PokerTable
+          :seats="tableSeats"
+          :local-session-id="sessionId"
+          :current-task="store.room.currentTask"
+          class="room__table"
+        />
 
         <RoomToolbar
           v-if="isMasterOrPublic"
@@ -58,6 +52,7 @@
           @reveal="reveal"
           @reset="reset"
           @set-deck="setDeck"
+          class="room__toolbar"
         />
 
         <div class="room__hand">
@@ -80,7 +75,8 @@ import type { ParticipantPayload } from '@vadim-codes/poker-contracts';
 import AppLayout from '@/components/layouts/AppLayout.vue';
 import { Alert, Loading } from '@/components/ui';
 import CardHand from '@/components/room/CardHand.vue';
-import PlayerSeat from '@/components/room/PlayerSeat.vue';
+import PokerTable from '@/components/room/PokerTable.vue';
+import type { TableSeat } from '@/components/room/PokerTable.vue';
 import ResultsSummary from '@/components/room/ResultsSummary.vue';
 import RoomHeader from '@/components/room/RoomHeader.vue';
 import RoomNameGate from '@/components/room/RoomNameGate.vue';
@@ -97,6 +93,7 @@ const hasName = computed(() => name.value.trim().length > 0);
 const {
   store,
   selectCard,
+  unselectCard,
   reveal,
   reset,
   setTask,
@@ -128,9 +125,13 @@ watch(
   }
 );
 
-function onSelectCard(value: string): void {
+function onSelectCard(value: string | null): void {
   mySelectedCard.value = value;
-  selectCard(value);
+  if (value === null) {
+    unselectCard();
+  } else {
+    selectCard(value);
+  }
 }
 
 function seatCardState(p: ParticipantPayload): 'idle' | 'voted' | 'revealed' {
@@ -139,6 +140,22 @@ function seatCardState(p: ParticipantPayload): 'idle' | 'voted' | 'revealed' {
   }
   return p.hasVoted ? 'voted' : 'idle';
 }
+
+const tableSeats = computed<TableSeat[]>(() => {
+  if (!store.room) {
+    return [];
+  }
+  return store.room.participants.map((p) => ({
+    sessionId: p.sessionId,
+    name: p.name,
+    cardState: seatCardState(p),
+    cardValue: store.room!.votes?.[p.sessionId] ?? undefined,
+    isMaster: p.sessionId === store.room!.masterSessionId,
+    isConnected: p.isConnected,
+    onKick:
+      isMaster.value && p.sessionId !== sessionId ? () => kickParticipant(p.sessionId) : undefined,
+  }));
+});
 </script>
 
 <style scoped lang="scss">
@@ -158,22 +175,25 @@ function seatCardState(p: ParticipantPayload): 'idle' | 'voted' | 'revealed' {
 
 .room {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   gap: 1.5rem;
   padding: 1.5rem;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
-
-  &__participants {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
+  justify-content: space-between;
 
   &__hand {
     background: var(--color-base-100);
     border: 1px solid var(--color-base-300);
     border-radius: 0.75rem;
+
+    // position: fixed;
+    bottom: 1.5rem;
+    // left: 50%;
+    // transform: translateX(-50%);
+    // width: clamp(200px, (calc(100vw - 3rem)), 900px);
   }
 }
 </style>

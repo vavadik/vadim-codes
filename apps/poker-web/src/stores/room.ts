@@ -68,6 +68,16 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  function cardUnselected(sessionId: string): void {
+    if (!room.value) {
+      return;
+    }
+    const p = room.value.participants.find((p) => p.sessionId === sessionId);
+    if (p) {
+      p.hasVoted = false;
+    }
+  }
+
   function cardsRevealed(payload: CardsRevealedPayload): void {
     if (!room.value) {
       return;
@@ -148,6 +158,7 @@ export const useRoomStore = defineStore('room', () => {
     participantDisconnected,
     participantReconnected,
     cardSelected,
+    cardUnselected,
     cardsRevealed,
     taskUpdated,
     deckChanged,

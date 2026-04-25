@@ -154,6 +154,28 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomId).emit('cardSelected', { sessionId });
   }
 
+  @SubscribeMessage('unselectCard')
+  async handleUnselectCard(@ConnectedSocket() client: Socket): Promise<void> {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+
+    const { roomId, sessionId } = meta;
+    const room = await this.roomService.getRoom(roomId);
+    if (!room || room.state !== 'voting') {
+      return;
+    }
+
+    const participant = room.participants.get(sessionId);
+    if (!participant) {
+      return;
+    }
+
+    participant.selectedCard = null;
+    this.server.to(roomId).emit('cardUnselected', { sessionId });
+  }
+
   @SubscribeMessage('reveal')
   async handleReveal(@ConnectedSocket() client: Socket): Promise<void> {
     const meta = this.socketMeta.get(client.id);

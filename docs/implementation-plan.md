@@ -63,11 +63,11 @@ After this phase: facilitators have full control; rooms clean themselves up.
 
 After this phase: the app looks and feels like a real poker table.
 
-| #     | Story                                                     | Status | Notes                                    |
-| ----- | --------------------------------------------------------- | ------ | ---------------------------------------- |
-| PS-15 | [Poker table layout](stories/PS-15-poker-table-layout.md) | ⬜     | Rounded-rect table, players on perimeter |
-| PS-16 | [Card hand fan layout](stories/PS-16-card-hand-fan.md)    | ⬜     | Overlapping fan, hover/select animations |
-| PS-17 | [Light / dark theme](stories/PS-17-theme-support.md)      | ⬜     | OS default, localStorage, felt colour    |
+| #     | Story                                                     | Status | Notes                                                                           |
+| ----- | --------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| PS-15 | [Poker table layout](stories/PS-15-poker-table-layout.md) | ✅     | PokerTable.vue + useTableLayout composable; ellipse seat distribution           |
+| PS-16 | [Card hand fan layout](stories/PS-16-card-hand-fan.md)    | ✅     | Fan rotation via CSS custom property; hover/select lift; mobile scroll fallback |
+| PS-17 | [Light / dark theme](stories/PS-17-theme-support.md)      | ✅     | useTheme + AppLayout toggle; --felt-color variable in both themes               |
 
 ---
 

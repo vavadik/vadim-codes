@@ -47,16 +47,15 @@
         ⚙
       </button>
     </div>
+    <RoomSettingsModal
+      :open="settingsOpen"
+      :transfer-master="transferMaster"
+      :toggle-public-mode="togglePublicMode"
+      :set-title="setTitle"
+      :set-deck="setDeck"
+      @close="settingsOpen = false"
+    />
   </div>
-
-  <RoomSettingsModal
-    :open="settingsOpen"
-    :transfer-master="transferMaster"
-    :toggle-public-mode="togglePublicMode"
-    :set-title="setTitle"
-    :set-deck="setDeck"
-    @close="settingsOpen = false"
-  />
 </template>
 
 <script setup lang="ts">

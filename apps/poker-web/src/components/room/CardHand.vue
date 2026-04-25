@@ -1,18 +1,21 @@
 <template>
-  <div class="card-hand">
-    <button
-      v-for="value in allCards"
+  <div class="card-hand" :class="{ 'card-hand--disabled': disabled }">
+    <div
+      v-for="(value, i) in allCards"
       :key="value"
-      class="card-hand__card"
-      :class="{
-        'card-hand__card--selected': value === selectedValue,
-        'card-hand__card--disabled': disabled,
-      }"
-      :disabled="disabled"
+      class="card-hand__slot"
+      :style="{ marginLeft: i === 0 ? '0' : '-2.5rem', zIndex: i }"
       @click="select(value)"
     >
-      {{ value }}
-    </button>
+      <button
+        class="card-hand__card"
+        :class="{ 'card-hand__card--selected': value === selectedValue }"
+        :disabled="disabled"
+      >
+        <span class="card-hand__corner card-hand__corner--tl">{{ value }}</span>
+        <span class="card-hand__corner card-hand__corner--br">{{ value }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -27,13 +30,13 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits<{ 'update:selectedValue': [value: string] }>();
+const emit = defineEmits<{ 'update:selectedValue': [value: string | null] }>();
 
 const allCards = computed(() => [...props.deckValues, ...SPECIAL_CARDS]);
 
 function select(value: string): void {
   if (!props.disabled) {
-    emit('update:selectedValue', value);
+    emit('update:selectedValue', value === props.selectedValue ? null : value);
   }
 }
 </script>
@@ -42,45 +45,78 @@ function select(value: string): void {
 .card-hand {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem 0;
   justify-content: center;
-  padding: 1rem;
+  align-items: flex-end;
+  user-select: none;
+  // top padding gives cards room to lift into on hover
+  padding: 1rem 1.5rem;
+
+  &--disabled {
+    opacity: 0.65;
+  }
+
+  &__slot {
+    flex-shrink: 0;
+    width: 5rem;
+    height: 7rem;
+    cursor: pointer;
+
+    &:hover .card-hand__card:not(:disabled) {
+      transform: translateY(-2rem);
+      border-color: var(--color-accent);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    &:hover .card-hand__card--selected:not(:disabled) {
+      transform: translateY(-3rem);
+    }
+  }
 
   &__card {
-    min-width: 3rem;
-    height: 4.5rem;
+    position: relative;
+    width: 100%;
+    height: 100%;
     border: 2px solid var(--color-base-300);
-    border-radius: 0.5rem;
+    border-radius: 0.6rem;
     background: var(--color-base-100);
-    color: var(--color-base-content);
-    font-size: 1rem;
-    font-weight: 600;
     cursor: pointer;
     transition:
-      transform 0.15s,
-      border-color 0.15s,
-      background 0.15s;
-    padding: 0 0.75rem;
-
-    &:hover:not(:disabled) {
-      transform: translateY(-4px);
-      border-color: var(--color-accent);
-    }
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      border-color 150ms ease,
+      background 150ms ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
     &--selected {
-      transform: translateY(-8px);
+      transform: translateY(-2.5rem);
       border-color: var(--color-accent);
       background: var(--color-accent-subtle);
-      color: var(--color-accent);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      z-index: 99 !important;
+
+      .card-hand__corner {
+        color: var(--color-accent);
+      }
+    }
+  }
+
+  &__corner {
+    position: absolute;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-base-content);
+
+    &--tl {
+      top: 0.4rem;
+      left: 0.45rem;
     }
 
-    &--disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-
-      &:hover {
-        transform: none;
-      }
+    &--br {
+      bottom: 0.4rem;
+      right: 0.45rem;
+      transform: rotate(180deg);
     }
   }
 }

@@ -81,6 +81,10 @@ export function useRoom(roomId: string) {
       store.cardSelected(sid);
     });
 
+    socket.on('cardUnselected', ({ sessionId: sid }: CardSelectedPayload) => {
+      store.cardUnselected(sid);
+    });
+
     socket.on('cardsRevealed', (payload: CardsRevealedPayload) => {
       store.cardsRevealed(payload);
     });
@@ -104,6 +108,10 @@ export function useRoom(roomId: string) {
 
   function selectCard(value: string): void {
     socket?.emit('selectCard', { value });
+  }
+
+  function unselectCard(): void {
+    socket?.emit('unselectCard');
   }
 
   function reveal(): void {
@@ -160,6 +168,7 @@ export function useRoom(roomId: string) {
   return {
     store,
     selectCard,
+    unselectCard,
     reveal,
     reset,
     setTask,
