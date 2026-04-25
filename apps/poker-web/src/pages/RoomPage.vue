@@ -14,11 +14,11 @@
       </div>
 
       <div v-else-if="store.room" class="room">
-        <ResultsSummary
+        <ResultsDrawer
           v-if="store.room.state === 'revealed' && store.room.votes"
           :votes="store.room.votes"
           :participants="store.room.participants"
-          class="room__results-summary"
+          :auto-open="revealedThisSession"
         />
 
         <RoomHeader
@@ -77,7 +77,7 @@ import { Alert, Loading } from '@/components/ui';
 import CardHand from '@/components/room/CardHand.vue';
 import PokerTable from '@/components/room/PokerTable.vue';
 import type { TableSeat } from '@/components/room/PokerTable.vue';
-import ResultsSummary from '@/components/room/ResultsSummary.vue';
+import ResultsDrawer from '@/components/room/ResultsDrawer.vue';
 import RoomHeader from '@/components/room/RoomHeader.vue';
 import RoomNameGate from '@/components/room/RoomNameGate.vue';
 import RoomToolbar from '@/components/room/RoomToolbar.vue';
@@ -116,11 +116,15 @@ const isLeaderless = computed(
 );
 
 const mySelectedCard = ref<string | null>(null);
+const revealedThisSession = ref(false);
 watch(
   () => store.room?.state,
-  (state) => {
+  (state, prev) => {
     if (state === 'voting') {
       mySelectedCard.value = null;
+      revealedThisSession.value = false;
+    } else if (state === 'revealed' && prev === 'voting') {
+      revealedThisSession.value = true;
     }
   }
 );

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-base-200 flex flex-col">
-    <div class="navbar bg-base-100 border-b border-base-300 px-6">
+    <div class="navbar bg-base-100 border-b border-base-300 px-6 sticky top-0 z-100">
       <div class="navbar-start">
         <RouterLink to="/" class="text-xl font-bold">Scrum Poker</RouterLink>
       </div>
