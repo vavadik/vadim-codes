@@ -4,7 +4,7 @@
       v-for="(value, i) in allCards"
       :key="value"
       class="card-hand__slot"
-      :style="{ marginLeft: i === 0 ? '0' : '-2.5rem', zIndex: i }"
+      :style="{ zIndex: i }"
       @click="select(value)"
     >
       <button
@@ -50,7 +50,7 @@ function select(value: string): void {
   align-items: flex-end;
   user-select: none;
   // top padding gives cards room to lift into on hover
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.5rem 1rem 4rem;
 
   &--disabled {
     opacity: 0.65;
@@ -61,15 +61,18 @@ function select(value: string): void {
     width: 5rem;
     height: 7rem;
     cursor: pointer;
+    margin-left: -2.5rem;
 
-    &:hover .card-hand__card:not(:disabled) {
-      transform: translateY(-2rem);
-      border-color: var(--color-accent);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-    }
+    @media (hover: hover) {
+      &:hover .card-hand__card:not(:disabled) {
+        transform: translateY(-2rem);
+        border-color: var(--color-accent);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+      }
 
-    &:hover .card-hand__card--selected:not(:disabled) {
-      transform: translateY(-3rem);
+      &:hover .card-hand__card--selected:not(:disabled) {
+        transform: translateY(-3rem);
+      }
     }
   }
 
