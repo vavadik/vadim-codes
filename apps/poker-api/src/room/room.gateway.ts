@@ -18,10 +18,12 @@ import type {
   ParticipantRenamedPayload,
   ParticipantReconnectedPayload,
   PublicModeChangedPayload,
+  ReactionPayload,
   RenameSelfPayload,
   Room,
   RoomStatePayload,
   SelectCardPayload,
+  SendReactionPayload,
   SetDeckPayload,
   SetTaskPayload,
   SetTitlePayload,
@@ -119,7 +121,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.socketMeta.set(client.id, { roomId, sessionId });
     await client.join(roomId);
 
-    client.emit('roomState', this.buildRoomState(room));
+    client.emit('roomState', this.buildRoomState(room, sessionId));
 
     if (!isReconnect) {
       const participant = room.participants.get(sessionId)!;
@@ -379,6 +381,23 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomId).emit('roundReset');
   }
 
+  @SubscribeMessage('sendReaction')
+  handleSendReaction(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: SendReactionPayload
+  ): void {
+    const meta = this.socketMeta.get(client.id);
+    if (!meta) {
+      return;
+    }
+    const { roomId, sessionId } = meta;
+    if (!payload.emoji || typeof payload.emoji !== 'string' || payload.emoji.length > 12) {
+      return;
+    }
+    const response: ReactionPayload = { sessionId, emoji: payload.emoji };
+    this.server.to(roomId).emit('reaction', response);
+  }
+
   @SubscribeMessage('renameSelf')
   async handleRenameSelf(
     @ConnectedSocket() client: Socket,
@@ -402,7 +421,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomId).emit('participantRenamed', response);
   }
 
-  private buildRoomState(room: Room): RoomStatePayload {
+  private buildRoomState(room: Room, requestingSessionId: string): RoomStatePayload {
     const isRevealed = room.state === 'revealed';
     const votes: Record<string, string | null> = {};
 
@@ -419,6 +438,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
+    const myVote = isRevealed
+      ? null
+      : (room.participants.get(requestingSessionId)?.selectedCard ?? null);
+
     return {
       id: room.id,
       title: room.title,
@@ -430,6 +453,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
       state: room.state,
       participants,
       votes: isRevealed ? votes : null,
+      myVote,
     };
   }
 }

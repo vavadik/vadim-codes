@@ -83,7 +83,7 @@ const breakdown = computed(() => {
   background: var(--color-base-100);
   border: 1px solid var(--color-base-300);
   border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
+  padding: 2rem 1.25rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

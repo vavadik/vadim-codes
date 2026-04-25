@@ -56,6 +56,7 @@
         />
 
         <div class="room__hand">
+          <EmojiReactionBar @react="sendReaction" />
           <CardHand
             :deck-values="store.room.deckValues"
             :selected-value="mySelectedCard"
@@ -75,6 +76,7 @@ import type { ParticipantPayload } from '@vadim-codes/poker-contracts';
 import AppLayout from '@/components/layouts/AppLayout.vue';
 import { Alert, Loading } from '@/components/ui';
 import CardHand from '@/components/room/CardHand.vue';
+import EmojiReactionBar from '@/components/room/EmojiReactionBar.vue';
 import PokerTable from '@/components/room/PokerTable.vue';
 import type { TableSeat } from '@/components/room/PokerTable.vue';
 import ResultsDrawer from '@/components/room/ResultsDrawer.vue';
@@ -92,6 +94,7 @@ const hasName = computed(() => name.value.trim().length > 0);
 
 const {
   store,
+  reactions,
   selectCard,
   unselectCard,
   reveal,
@@ -102,6 +105,7 @@ const {
   togglePublicMode,
   setTitle,
   kickParticipant,
+  sendReaction,
 } = useRoom(roomId);
 
 const isMaster = computed(() => store.room?.masterSessionId === sessionId);
@@ -117,14 +121,30 @@ const isLeaderless = computed(
 
 const mySelectedCard = ref<string | null>(null);
 const revealedThisSession = ref(false);
+
 watch(
   () => store.room?.state,
   (state, prev) => {
     if (state === 'voting') {
-      mySelectedCard.value = null;
+      if (prev === undefined) {
+        // Initial load: restore whatever card the server remembered for this session
+        mySelectedCard.value = store.room?.myVote ?? null;
+      } else {
+        // Actual round reset (revealed → voting)
+        mySelectedCard.value = null;
+      }
       revealedThisSession.value = false;
     } else if (state === 'revealed' && prev === 'voting') {
       revealedThisSession.value = true;
+    }
+  }
+);
+watch(
+  () => store.room?.deckValues,
+  (_newVals, oldVals) => {
+    // Skip the initial load (undefined → first value); only clear on real deck changes
+    if (oldVals !== undefined) {
+      mySelectedCard.value = null;
     }
   }
 );
@@ -158,6 +178,7 @@ const tableSeats = computed<TableSeat[]>(() => {
     isConnected: p.isConnected,
     onKick:
       isMaster.value && p.sessionId !== sessionId ? () => kickParticipant(p.sessionId) : undefined,
+    reactions: reactions.value[p.sessionId] ?? [],
   }));
 });
 </script>

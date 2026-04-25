@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { io, type Socket } from 'socket.io-client';
 import type {
   CardsRevealedPayload,
@@ -11,12 +11,18 @@ import type {
   ParticipantLeftPayload,
   CardSelectedPayload,
   PublicModeChangedPayload,
+  ReactionPayload,
   RoomStatePayload,
   TaskUpdatedPayload,
   TitleUpdatedPayload,
 } from '@vadim-codes/poker-contracts';
 import { useSession } from './useSession';
 import { useRoomStore } from '@/stores/room';
+
+export interface ActiveReaction {
+  id: number;
+  emoji: string;
+}
 
 const API_URL = import.meta.env.VITE_API_URL ?? window.location.origin;
 
@@ -25,6 +31,8 @@ export function useRoom(roomId: string) {
   const store = useRoomStore();
 
   let socket: Socket | null = null;
+  const reactions = ref<Record<string, ActiveReaction[]>>({});
+  let reactionIdCounter = 0;
 
   function connect(): void {
     store.isConnecting = true;
@@ -102,6 +110,20 @@ export function useRoom(roomId: string) {
       store.deckChanged(payload);
     });
 
+    socket.on('reaction', ({ sessionId: sid, emoji }: ReactionPayload) => {
+      const id = ++reactionIdCounter;
+      reactions.value = {
+        ...reactions.value,
+        [sid]: [...(reactions.value[sid] ?? []), { id, emoji }],
+      };
+      setTimeout(() => {
+        reactions.value = {
+          ...reactions.value,
+          [sid]: (reactions.value[sid] ?? []).filter((r) => r.id !== id),
+        };
+      }, 2500);
+    });
+
     socket.on(
       'participantRenamed',
       ({ sessionId: sid, name: newName }: ParticipantRenamedPayload) => {
@@ -164,6 +186,10 @@ export function useRoom(roomId: string) {
     socket?.emit('kickParticipant', { sessionId: targetSessionId });
   }
 
+  function sendReaction(emoji: string): void {
+    socket?.emit('sendReaction', { emoji });
+  }
+
   onMounted(() => {
     store.clear();
     if (name.value) {
@@ -189,6 +215,7 @@ export function useRoom(roomId: string) {
 
   return {
     store,
+    reactions,
     selectCard,
     unselectCard,
     reveal,
@@ -200,5 +227,6 @@ export function useRoom(roomId: string) {
     setTitle,
     kickParticipant,
     renameSelf,
+    sendReaction,
   };
 }

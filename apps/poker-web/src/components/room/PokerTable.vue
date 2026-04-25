@@ -16,6 +16,7 @@
           :is-master="seat.isMaster"
           :is-connected="seat.isConnected"
           :on-kick="seat.onKick"
+          :reactions="seat.reactions"
         />
       </div>
     </div>
@@ -26,6 +27,7 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import PlayerSeat from './PlayerSeat.vue';
 import { computeTableLayout } from '@/composables/useTableLayout';
+import type { ActiveReaction } from '@/composables/useRoom';
 
 export interface TableSeat {
   sessionId: string;
@@ -35,6 +37,7 @@ export interface TableSeat {
   isMaster: boolean;
   isConnected: boolean;
   onKick?: () => void;
+  reactions?: ActiveReaction[];
 }
 
 const props = defineProps<{

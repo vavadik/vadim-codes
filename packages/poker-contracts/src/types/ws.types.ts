@@ -20,6 +20,7 @@ export interface RoomStatePayload {
   state: RoomState;
   participants: ParticipantPayload[];
   votes: Record<string, string | null> | null; // populated only when state = 'revealed'
+  myVote: string | null; // the requesting client's own card; null when revealed (votes covers it)
 }
 
 // ── Client → Server events ──────────────────────────────────────────────────
@@ -127,4 +128,15 @@ export interface RenameSelfPayload {
 export interface ParticipantRenamedPayload {
   sessionId: string;
   name: string;
+}
+
+// ── Reactions ─────────────────────────────────────────────────────────────────
+
+export interface SendReactionPayload {
+  emoji: string;
+}
+
+export interface ReactionPayload {
+  sessionId: string;
+  emoji: string;
 }

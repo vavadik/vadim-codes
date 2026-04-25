@@ -101,5 +101,5 @@
 }
 
 @theme inline {
-  --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }

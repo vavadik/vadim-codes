@@ -26,4 +26,6 @@ export type {
   KickParticipantPayload,
   RenameSelfPayload,
   ParticipantRenamedPayload,
+  SendReactionPayload,
+  ReactionPayload,
 } from './types/ws.types';

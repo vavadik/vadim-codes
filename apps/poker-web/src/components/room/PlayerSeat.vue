@@ -1,5 +1,9 @@
 <template>
   <div class="player-seat" :class="{ 'player-seat--disconnected': !isConnected }">
+    <div v-for="r in reactions" :key="r.id" class="player-seat__reaction">
+      {{ r.emoji }}
+    </div>
+
     <div class="player-seat__card" :class="`player-seat__card--${cardState}`">
       <span v-if="cardState === 'revealed'">{{ cardValue ?? '–' }}</span>
       <span v-else-if="cardState === 'voted'" class="player-seat__checkmark">✓</span>
@@ -21,6 +25,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ActiveReaction } from '@/composables/useRoom';
+
 defineProps<{
   name: string;
   cardState: 'idle' | 'voted' | 'revealed';
@@ -28,11 +34,27 @@ defineProps<{
   isMaster?: boolean;
   isConnected?: boolean;
   onKick?: () => void;
+  reactions?: ActiveReaction[];
 }>();
 </script>
 
 <style scoped lang="scss">
+@keyframes reaction-float {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  15% {
+    transform: translate(-50%, -0.25rem) scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -3.5rem) scale(0.8);
+  }
+}
+
 .player-seat {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,6 +63,17 @@ defineProps<{
 
   &--disconnected {
     opacity: 0.45;
+  }
+
+  &__reaction {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    font-size: 1.75rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: reaction-float 2s ease-out forwards;
+    z-index: 10;
   }
 
   &__card {

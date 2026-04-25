@@ -49,11 +49,11 @@ function select(value: string): void {
   justify-content: center;
   align-items: flex-end;
   user-select: none;
-  // top padding gives cards room to lift into on hover
-  padding: 1rem 1.5rem 1rem 4rem;
+  // top padding must cover the max card lift (3rem hover-selected) plus a small gap
+  padding: 3.5rem 1.5rem 1rem 4rem;
 
   &--disabled {
-    opacity: 0.65;
+    // opacity: 0.65;
   }
 
   &__slot {
