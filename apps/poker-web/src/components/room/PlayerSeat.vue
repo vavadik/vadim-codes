@@ -117,7 +117,8 @@ defineProps<{
   }
 
   &__name {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 600;
     text-align: center;
     max-width: 5rem;
     overflow: hidden;
