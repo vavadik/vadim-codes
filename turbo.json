@@ -62,6 +62,16 @@
       "cache": false,
       "persistent": true
     },
+    "sandbox-api#dev": {
+      "dependsOn": ["@vadim-codes/sandbox-contracts#build", "@vadim-codes/sandbox-db#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "sandbox-web#dev": {
+      "dependsOn": ["@vadim-codes/sandbox-contracts#build"],
+      "cache": false,
+      "persistent": true
+    },
     "test": {
       "dependsOn": ["^test"],
       "cache": false
