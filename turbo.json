@@ -49,6 +49,19 @@
       "cache": false,
       "persistent": true
     },
+    "boilerplate-api#dev": {
+      "dependsOn": [
+        "@vadim-codes/boilerplate-contracts#build",
+        "@vadim-codes/boilerplate-db#build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "boilerplate-web#dev": {
+      "dependsOn": ["@vadim-codes/boilerplate-contracts#build"],
+      "cache": false,
+      "persistent": true
+    },
     "test": {
       "dependsOn": ["^test"],
       "cache": false
