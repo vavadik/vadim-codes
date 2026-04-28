@@ -2,7 +2,7 @@ import { ref, watchEffect } from 'vue';
 
 type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = 'sandbox-theme';
+const STORAGE_KEY = 'sandbox:theme';
 
 const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
 const system: Theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -14,10 +14,13 @@ watchEffect(() => {
 });
 
 export function useTheme() {
-  return {
-    theme,
-    toggle: () => {
-      theme.value = theme.value === 'light' ? 'dark' : 'light';
-    },
-  };
+  function setTheme(t: Theme): void {
+    theme.value = t;
+  }
+
+  function toggleTheme(): void {
+    theme.value = theme.value === 'light' ? 'dark' : 'light';
+  }
+
+  return { theme, toggleTheme, setTheme };
 }

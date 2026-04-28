@@ -10,11 +10,11 @@ Infrastructure and shell. No execution, no snippets, no auth. After this phase t
 
 | #       | Story                                                                    | Estimate | Status | Notes |
 | ------- | ------------------------------------------------------------------------ | -------- | ------ | ----- |
-| TASK-01 | [DB schema — Users & Snippets](stories/TASK-01-db-schema.md)             | S        | ⬜     |       |
-| TASK-02 | [Short ID service (nanoid, 8-char)](stories/TASK-02-short-id-service.md) | XS       | ⬜     |       |
-| CS-00   | [3-pane application layout](stories/CS-00-three-pane-layout.md)          | M        | ⬜     |       |
-| CS-01   | [Dark / light theme](stories/CS-01-theme-support.md)                     | S        | ⬜     |       |
-| CS-04   | [Monaco editor core](stories/CS-04-editor-core.md)                       | M        | ⬜     |       |
+| TASK-01 | [DB schema — Users & Snippets](stories/TASK-01-db-schema.md)             | S        | ✅     |       |
+| TASK-02 | [Short ID service (nanoid, 8-char)](stories/TASK-02-short-id-service.md) | XS       | ✅     |       |
+| CS-00   | [3-pane application layout](stories/CS-00-three-pane-layout.md)          | M        | ✅     |       |
+| CS-01   | [Dark / light theme](stories/CS-01-theme-support.md)                     | S        | ✅     |       |
+| CS-04   | [Monaco editor core](stories/CS-04-editor-core.md)                       | M        | ✅     |       |
 
 ---
 
@@ -24,8 +24,8 @@ After this phase: users can sign in with Google or GitHub, view their identity i
 
 | #     | Story                                                                   | Estimate | Status | Notes |
 | ----- | ----------------------------------------------------------------------- | -------- | ------ | ----- |
-| CS-02 | [Google + GitHub OAuth](stories/CS-02-auth-oauth.md)                    | M        | ⬜     |       |
-| CS-03 | [Account deletion (orphan snippets)](stories/CS-03-account-deletion.md) | S        | ⬜     |       |
+| CS-02 | [Google + GitHub OAuth](stories/CS-02-auth-oauth.md)                    | M        | ✅     |       |
+| CS-03 | [Account deletion (orphan snippets)](stories/CS-03-account-deletion.md) | S        | ✅     |       |
 
 ---
 

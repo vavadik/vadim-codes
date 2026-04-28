@@ -7,10 +7,43 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
+model User {
   id        String   @id @default(cuid())
-  title     String
-  done      Boolean  @default(false)
+  email     String?  @unique
+  name      String?
+  avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  accounts OAuthAccount[]
+  snippets Snippet[]
+}
+
+model OAuthAccount {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Snippet {
+  id           String    @id
+  code         String    @db.Text
+  title        String?
+  preview      String?
+  userId       String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastViewedAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([lastViewedAt])
 }
