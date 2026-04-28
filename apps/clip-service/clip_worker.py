@@ -6,12 +6,15 @@ import time
 from io import BytesIO
 
 import numpy as np
+import torch
 from PIL import Image
-from sentence_transformers import SentenceTransformer
+from transformers import CLIPModel, CLIPProcessor
 
-MODEL_NAME = os.getenv("CLIP_MODEL_NAME", "clip-ViT-B-32")
+MODEL_NAME = os.getenv("CLIP_MODEL_NAME", "openai/clip-vit-base-patch16")
 
-model = SentenceTransformer(MODEL_NAME)
+processor = CLIPProcessor.from_pretrained(MODEL_NAME)
+model = CLIPModel.from_pretrained(MODEL_NAME)
+model.eval()
 
 sys.stdout.write(json.dumps({"type": "ready", "model": MODEL_NAME}) + "\n")
 sys.stdout.flush()
@@ -27,8 +30,16 @@ def handle_rank(req_id: str, params: dict) -> dict:
         for entry in image_entries
     ]
 
-    text_emb = model.encode([prompt])[0]
-    img_embs = model.encode(images)
+    with torch.no_grad():
+        text_inputs = processor(text=[prompt], return_tensors="pt", padding=True)
+        image_inputs = processor(images=images, return_tensors="pt")
+        outputs = model(
+            input_ids=text_inputs["input_ids"],
+            attention_mask=text_inputs["attention_mask"],
+            pixel_values=image_inputs["pixel_values"],
+        )
+        text_emb = outputs.text_embeds[0].float().cpu().numpy()
+        img_embs = outputs.image_embeds.float().cpu().numpy()
 
     text_norm = text_emb / np.linalg.norm(text_emb)
     results = []
@@ -59,6 +70,7 @@ for line in sys.stdin:
     line = line.strip()
     if not line:
         continue
+    req_id = None
     try:
         req = json.loads(line)
         req_id = req.get("id")
@@ -73,5 +85,7 @@ for line in sys.stdin:
 
         sys.stdout.flush()
     except Exception as e:
-        sys.stdout.write(json.dumps({"id": None, "error": str(e)}) + "\n")
+        sys.stderr.write(f"[clip_worker] error (id={req_id}): {e}\n")
+        sys.stderr.flush()
+        sys.stdout.write(json.dumps({"id": req_id, "error": str(e)}) + "\n")
         sys.stdout.flush()

@@ -111,7 +111,11 @@ export class ClipProcessService implements OnApplicationBootstrap, BeforeApplica
       return;
     }
 
-    const id = msg['id'] as string;
+    const id = msg['id'] as string | null;
+    if (!id) {
+      this.logger.error(`Worker error (no id): ${msg['error']}`);
+      return;
+    }
     const pending = this.pending.get(id);
     if (!pending) {
       return;
