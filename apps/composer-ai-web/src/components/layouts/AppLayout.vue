@@ -8,7 +8,6 @@
         <RouterLink to="/salesforce" class="link link-hover text-sm">Salesforce</RouterLink>
         <RouterLink to="/design-system" class="link link-hover text-sm">Design System</RouterLink>
         <RouterLink to="/todos" class="link link-hover text-sm">Todos</RouterLink>
-        <RouterLink to="/editor" class="link link-hover text-sm">Editor</RouterLink>
         <a href="#" class="link link-hover text-sm">GitHub</a>
         <div v-if="authStore.isAuthenticated" class="flex items-center gap-3">
           <span class="text-sm text-base-content/60">{{ authStore.user?.email }}</span>

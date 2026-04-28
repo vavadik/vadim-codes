@@ -24,10 +24,18 @@ export {
   sfSObjectDescribeSchema,
   sfSObjectSummarySchema,
   sfFieldSchema,
+  sfChildRelationshipSchema,
+  sfImageAttachmentSchema,
+  sfImageSearchResponseSchema,
+  sfImageSearchResultSchema,
   type SfDescribeGlobal,
   type SfSObjectDescribe,
   type SfSObjectSummary,
   type SfField,
+  type SfChildRelationship,
+  type SfImageAttachment,
+  type SfImageSearchResult,
+  type SfImageSearchResponse,
   type SfRecord,
 } from './dtos/salesforce.dto';
 export { generateOpenApiDocument } from './openapi';

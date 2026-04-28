@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Connection } from 'jsforce';
 import { SalesforceService } from 'src/salesforce/salesforce.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ClipProcessService } from 'src/clip/clip-process.service';
+import { ImagePreprocessService } from 'src/image-preprocess/image-preprocess.service';
 
 vi.mock('jsforce', () => ({ Connection: vi.fn() }));
 
@@ -63,7 +65,18 @@ describe('SalesforceService', () => {
     };
 
     const module = await Test.createTestingModule({
-      providers: [SalesforceService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        SalesforceService,
+        { provide: PrismaService, useValue: prisma },
+        {
+          provide: ClipProcessService,
+          useValue: { isReady: true, send: vi.fn() },
+        },
+        {
+          provide: ImagePreprocessService,
+          useValue: { getFromCache: vi.fn(), prepareBuffer: vi.fn() },
+        },
+      ],
     }).compile();
 
     service = module.get(SalesforceService);

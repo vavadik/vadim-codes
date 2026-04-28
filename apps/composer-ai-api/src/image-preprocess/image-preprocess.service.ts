@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { createHash } from 'crypto';
 import { Readable } from 'stream';
 import sharp from 'sharp';
@@ -6,10 +6,38 @@ import { BlobStore } from '../blob-store/blob-store.abstract.js';
 
 @Injectable()
 export class ImagePreprocessService {
+  private readonly logger = new Logger(ImagePreprocessService.name);
+
   constructor(private readonly blobStore: BlobStore) {}
+
+  async getFromCache(key: string): Promise<Buffer | null> {
+    return this.blobStore.get(key);
+  }
 
   async prepare(urls: string[]): Promise<{ key: string; data: string }[]> {
     return Promise.all(urls.map((url) => this.preprocessOne(url)));
+  }
+
+  async prepareBuffer(
+    key: string,
+    fetchBuffer: () => Promise<Buffer>
+  ): Promise<{ key: string; data: string }> {
+    const cached = await this.blobStore.get(key);
+    if (cached) {
+      this.logger.debug(`cache hit: ${key}`);
+      return { key, data: cached.toString('base64') };
+    }
+
+    this.logger.debug(`cache miss: ${key} — fetching and preprocessing`);
+    const rawBuffer = await fetchBuffer();
+    const buffer = await sharp(rawBuffer)
+      .flatten({ background: '#fff' })
+      .resize(256, 256, { fit: 'outside' })
+      .jpeg()
+      .toBuffer();
+    await this.blobStore.put(key, buffer);
+    this.logger.debug(`cached preprocessed image: ${key} (${buffer.byteLength} bytes)`);
+    return { key, data: buffer.toString('base64') };
   }
 
   private async preprocessOne(url: string): Promise<{ key: string; data: string }> {

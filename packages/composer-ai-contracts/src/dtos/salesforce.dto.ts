@@ -31,8 +31,37 @@ export const sfFieldSchema = z.object({
     .describe('Relationship API name for reference fields, or null'),
 });
 
+export const sfChildRelationshipSchema = z.object({
+  childSObject: z.string(),
+  field: z.string(),
+  relationshipName: z.string().nullable(),
+  cascadeDelete: z.boolean(),
+  restrictedDelete: z.boolean(),
+  deprecatedAndHidden: z.boolean(),
+});
+
+export const sfImageSearchResultSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  score: z.number(),
+});
+
+export const sfImageSearchResponseSchema = z.object({
+  results: z.array(sfImageSearchResultSchema),
+});
+
+export const sfImageAttachmentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  contentType: z.string(),
+  bodyLength: z.number(),
+});
+
 export const sfSObjectDescribeSchema = sfSObjectSummarySchema.extend({
   fields: z.array(sfFieldSchema).describe('All fields defined on this SObject'),
+  childRelationships: z
+    .array(sfChildRelationshipSchema)
+    .describe('Child relationships defined on this SObject'),
 });
 
 export const sfDescribeGlobalSchema = z.object({
@@ -47,6 +76,10 @@ export const sfRecordSchema = z
 
 export type SfSObjectSummary = z.infer<typeof sfSObjectSummarySchema>;
 export type SfField = z.infer<typeof sfFieldSchema>;
+export type SfChildRelationship = z.infer<typeof sfChildRelationshipSchema>;
+export type SfImageAttachment = z.infer<typeof sfImageAttachmentSchema>;
+export type SfImageSearchResult = z.infer<typeof sfImageSearchResultSchema>;
+export type SfImageSearchResponse = z.infer<typeof sfImageSearchResponseSchema>;
 export type SfSObjectDescribe = z.infer<typeof sfSObjectDescribeSchema>;
 export type SfDescribeGlobal = z.infer<typeof sfDescribeGlobalSchema>;
 export type SfRecord = z.infer<typeof sfRecordSchema>;

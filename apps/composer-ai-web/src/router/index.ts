@@ -26,7 +26,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/salesforce',
+      path: '/salesforce/:name?',
+      name: 'salesforce',
       component: () => import('@/pages/SalesforcePage.vue'),
       meta: { requiresAuth: true },
     },

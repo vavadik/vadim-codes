@@ -2,6 +2,8 @@ import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
 import {
   sfDescribeGlobalSchema,
+  sfImageAttachmentSchema,
+  sfImageSearchResponseSchema,
   sfRecordSchema,
   sfSObjectDescribeSchema,
 } from '../dtos/salesforce.dto';
@@ -85,6 +87,38 @@ export const salesforceContract = c.router({
     }),
     responses: {
       200: sfRecordSchema,
+      404: z.object({ message: z.string() }),
+    },
+  },
+  getImageAttachments: {
+    method: 'GET',
+    path: '/salesforce/:name/:id/images',
+    summary: 'List image attachments',
+    description: 'Returns metadata for all image Attachments linked to the given record.',
+    metadata: { tags: ['Salesforce'] },
+    pathParams: z.object({
+      name: z.string(),
+      id: z.string(),
+    }),
+    responses: {
+      200: z.array(sfImageAttachmentSchema),
+      404: z.object({ message: z.string() }),
+    },
+  },
+  searchImages: {
+    method: 'POST',
+    path: '/salesforce/:name/:id/images/search',
+    summary: 'Semantic image search',
+    description:
+      'Ranks image Attachments for the given record by similarity to a text prompt using CLIP. Returns top 3.',
+    metadata: { tags: ['Salesforce'] },
+    pathParams: z.object({
+      name: z.string(),
+      id: z.string(),
+    }),
+    body: z.object({ prompt: z.string().min(1).max(500) }),
+    responses: {
+      200: sfImageSearchResponseSchema,
       404: z.object({ message: z.string() }),
     },
   },
