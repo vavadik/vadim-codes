@@ -83,6 +83,7 @@ jobs:
           script: |
             set -e
             export NVM_DIR="$HOME/.nvm" && source "$NVM_DIR/nvm.sh"
+            export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
             cd ${{ secrets.VPS_REPO_PATH }}
             docker compose up -d postgres
             pnpm turbo run build --filter=composer-ai-api...

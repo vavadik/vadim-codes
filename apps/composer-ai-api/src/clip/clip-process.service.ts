@@ -51,10 +51,19 @@ export class ClipProcessService implements OnApplicationBootstrap, BeforeApplica
   private spawnWorker(): Promise<void> {
     const scriptPath = this.config.getOrThrow<string>('CLIP_WORKER_PATH');
     const projectDir = dirname(scriptPath);
+    const uvBinary = this.config.get<string>('UV_BINARY') ?? 'uv';
+
+    const home = process.env['HOME'] ?? '';
+    const extraPaths = [`${home}/.local/bin`, `${home}/.cargo/bin`].join(':');
+    const spawnEnv = {
+      ...process.env,
+      PATH: `${extraPaths}:${process.env['PATH'] ?? ''}`,
+      HF_HOME: `${projectDir}/.hf_cache`,
+    };
 
     return new Promise((resolve, reject) => {
-      this.worker = spawn('uv', ['run', '--directory', projectDir, 'python3', scriptPath], {
-        env: { ...process.env, HF_HOME: `${projectDir}/.hf_cache` },
+      this.worker = spawn(uvBinary, ['run', '--directory', projectDir, 'python3', scriptPath], {
+        env: spawnEnv,
         stdio: ['pipe', 'pipe', 'inherit'],
       });
 
