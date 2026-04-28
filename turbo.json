@@ -27,10 +27,15 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "clip-service#install:py": {
+      "inputs": ["pyproject.toml", "uv.lock"],
+      "outputs": [".venv/**"]
+    },
     "composer-ai-api#dev": {
       "dependsOn": [
         "@vadim-codes/composer-ai-contracts#build",
-        "@vadim-codes/composer-ai-db#build"
+        "@vadim-codes/composer-ai-db#build",
+        "clip-service#install:py"
       ],
       "env": [
         "COMPOSER_AI_API_PORT",
@@ -45,7 +50,8 @@
         "GITHUB_CALLBACK_URL",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
-        "GOOGLE_CALLBACK_URL"
+        "GOOGLE_CALLBACK_URL",
+        "CLIP_WORKER_PATH"
       ],
       "cache": false,
       "persistent": true

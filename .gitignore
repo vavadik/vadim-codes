@@ -39,3 +39,6 @@ yarn-error.log*
 
 # select-run CLI state
 scripts/.select-run-state.json
+# Python
+.venv/
+.hf_cache/

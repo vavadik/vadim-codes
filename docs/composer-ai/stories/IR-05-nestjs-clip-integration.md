@@ -1,4 +1,4 @@
-# IR-05 — NestJS: CLIP Service Integration
+# IR-05 — NestJS: CLIP Worker Integration
 
 **Type:** User Story  
 **Phase:** 3 — Integration  
@@ -10,23 +10,23 @@
 
 ## Acceptance Criteria
 
-- [ ] `ImagesService` calls the Python CLIP service at `POST /rank` via `HttpModule` (axios)
-- [ ] CLIP service base URL is read from the `CLIP_SERVICE_URL` environment variable
-- [ ] Request timeout is read from `CLIP_SERVICE_TIMEOUT_MS` (default: `10000` ms)
-- [ ] Successful CLIP response is passed through to the client unchanged
-- [ ] If the CLIP service returns `422`, NestJS surfaces `422 IMAGE_FETCH_FAILED`
-- [ ] If the CLIP service times out, NestJS returns `504 CLIP_SERVICE_TIMEOUT`
-- [ ] Any other CLIP service error returns `500 INTERNAL_ERROR`
+- [ ] `ImagesService.rank()` calls `ClipProcessService.send('rank', { prompt, images })` and returns the result
+- [ ] Successful response is passed through to the client unchanged
+- [ ] If the worker returns an `IMAGE_FETCH_FAILED` error, NestJS surfaces `422 IMAGE_FETCH_FAILED`
+- [ ] If the worker process has exited or is not ready, NestJS returns `503 CLIP_WORKER_UNAVAILABLE`
+- [ ] Any other unexpected error returns `500 INTERNAL_ERROR`
 
 ## Error Codes
 
-| HTTP  | Code                   | Trigger                              |
-| ----- | ---------------------- | ------------------------------------ |
-| `400` | `INVALID_INPUT`        | Validation failure (IR-04)           |
-| `422` | `IMAGE_FETCH_FAILED`   | CLIP service couldn't fetch a URL    |
-| `504` | `CLIP_SERVICE_TIMEOUT` | CLIP service did not respond in time |
-| `500` | `INTERNAL_ERROR`       | Unexpected error                     |
+| HTTP  | Code                      | Trigger                                |
+| ----- | ------------------------- | -------------------------------------- |
+| `400` | `INVALID_INPUT`           | Validation failure (IR-04)             |
+| `422` | `IMAGE_FETCH_FAILED`      | Worker couldn't fetch one or more URLs |
+| `503` | `CLIP_WORKER_UNAVAILABLE` | Worker process not ready or has exited |
+| `500` | `INTERNAL_ERROR`          | Unexpected error                       |
 
 ## Technical Notes
 
-- Depends on IR-03 (CLIP service fully working with cache) and IR-04 (NestJS module exists)
+- Depends on IR-03 (CLIP worker fully working with cache) and IR-04 (NestJS module exists)
+- `ClipProcessService` is already injected into `ImagesService` from IR-04 — this story wires up the actual call
+- No HTTP client, no `CLIP_SERVICE_URL` — communication goes through the child process stdin/stdout

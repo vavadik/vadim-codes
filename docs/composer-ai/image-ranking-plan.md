@@ -6,22 +6,22 @@
 
 ## Phase 0 — Foundation
 
-Infrastructure and scaffolding with no end-to-end flow. IR-01 and IR-04 have no dependencies on each other and can be developed in parallel. After this phase the Python service starts and returns a health response, and the NestJS route validates input and rejects bad requests.
+Infrastructure and scaffolding with no end-to-end flow. IR-01 and IR-04 have no dependencies on each other and can be developed in parallel. After this phase the Python worker starts and signals readiness over stdout, and the NestJS route validates input and rejects bad requests.
 
-| #     | Story                                                                      | Estimate | Status | Notes |
-| ----- | -------------------------------------------------------------------------- | -------- | ------ | ----- |
-| IR-01 | [Python CLIP Service: Setup & Health](stories/IR-01-clip-service-setup.md) | S        | ⬜     |       |
-| IR-04 | [NestJS Images Module & Validation](stories/IR-04-nestjs-images-module.md) | S        | ⬜     |       |
+| #     | Story                                                                           | Estimate | Status | Notes |
+| ----- | ------------------------------------------------------------------------------- | -------- | ------ | ----- |
+| IR-01 | [Python CLIP Worker: Setup & Ready Signal](stories/IR-01-clip-service-setup.md) | S        | ✅     |       |
+| IR-04 | [NestJS Images Module & Validation](stories/IR-04-nestjs-images-module.md)      | S        | ✅     |       |
 
 ---
 
 ## Phase 1 — Ranking Logic
 
-After this phase: the Python service can accept a prompt and a list of URLs, download and encode the images, and return ranked similarity scores.
+After this phase: the Python worker can accept a `rank` IPC request, download and encode the images, and return ranked similarity scores.
 
-| #     | Story                                                                          | Estimate | Status | Notes |
-| ----- | ------------------------------------------------------------------------------ | -------- | ------ | ----- |
-| IR-02 | [Python CLIP Service: Ranking Endpoint](stories/IR-02-clip-service-ranking.md) | M        | ⬜     |       |
+| #     | Story                                                                       | Estimate | Status | Notes |
+| ----- | --------------------------------------------------------------------------- | -------- | ------ | ----- |
+| IR-02 | [Python CLIP Worker: Ranking Method](stories/IR-02-clip-service-ranking.md) | M        | ⬜     |       |
 
 ---
 
@@ -37,12 +37,12 @@ After this phase: repeated requests for the same images skip re-encoding; cache 
 
 ## Phase 3 — Integration & Observability
 
-After this phase: `POST /images/rank` is fully wired end-to-end and both services expose health endpoints for monitoring.
+After this phase: `POST /images/rank` is fully wired end-to-end and NestJS exposes a health endpoint reflecting the CLIP worker's readiness.
 
-| #     | Story                                                                        | Estimate | Status | Notes |
-| ----- | ---------------------------------------------------------------------------- | -------- | ------ | ----- |
-| IR-05 | [NestJS: CLIP Service Integration](stories/IR-05-nestjs-clip-integration.md) | M        | ⬜     |       |
-| IR-06 | [Health Checks](stories/IR-06-health-checks.md)                              | XS       | ⬜     |       |
+| #     | Story                                                                       | Estimate | Status | Notes |
+| ----- | --------------------------------------------------------------------------- | -------- | ------ | ----- |
+| IR-05 | [NestJS: CLIP Worker Integration](stories/IR-05-nestjs-clip-integration.md) | M        | ⬜     |       |
+| IR-06 | [Health Checks](stories/IR-06-health-checks.md)                             | XS       | ⬜     |       |
 
 ---
 
@@ -76,7 +76,7 @@ Key rules:
 ## Future Milestones (out of scope for v1)
 
 - **Top-K / threshold filtering** — return only top N results or exclude results below a minimum score
-- **Redis-backed cache** — embedding persistence across Python service restarts
+- **Redis-backed cache** — embedding persistence across Python worker restarts
 - **Batch URL prefetching** — pre-warm cache for known image sets
 - **LLM reranking** — optional second pass for ambiguous or nuanced prompts
 - **Model upgrade** — swap to `clip-vit-large-patch14` for higher accuracy

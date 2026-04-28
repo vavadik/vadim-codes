@@ -1,4 +1,4 @@
-# IR-01 — Python CLIP Service: Setup & Health
+# IR-01 — Python CLIP Worker: Setup & Ready Signal
 
 **Type:** Task  
 **Phase:** 0 — Foundation  
@@ -6,23 +6,46 @@
 
 ## Story
 
-> As a developer, I want a Python FastAPI microservice that loads the CLIP model at startup and exposes a health endpoint, so that NestJS has a stable ML backend to call.
+> As a developer, I want a Python script that loads the CLIP model at startup and communicates over stdin/stdout, so that NestJS can spawn it as a managed child process and interact with it via JSON IPC.
 
 ## Acceptance Criteria
 
-- [ ] FastAPI app with uvicorn starts without errors
-- [ ] CLIP model (`openai/clip-vit-base-patch32`) is loaded once at startup into memory
-- [ ] `GET /health` returns `200 OK` with `{ "status": "ok", "model_loaded": true }`
-- [ ] `GET /health` returns `503` if the model is not yet loaded
-- [ ] Service reads configuration from environment variables:
-  - `CLIP_MODEL_NAME` (default: `openai/clip-vit-base-patch32`)
+- [ ] `clip_worker.py` starts without errors and loads the CLIP model
+- [ ] Once the model is loaded, the script writes `{"type": "ready", "model": "<model_name>"}` to stdout and flushes
+- [ ] Script then enters a request loop: reads newline-delimited JSON from stdin, writes newline-delimited JSON responses to stdout
+- [ ] `health` method returns `{"status": "ok", "model_loaded": true}`
+- [ ] Unknown methods return `{"id": "<id>", "error": "unknown method: <method>"}`
+- [ ] Script reads configuration from environment variables:
+  - `CLIP_MODEL_NAME` (default: `clip-ViT-B-32`)
   - `CLIP_CACHE_MAX_SIZE` (default: `2000`)
 - [ ] Memory footprint with model loaded is under 1 GB
 
+## IPC Protocol
+
+**Request** (NestJS → Python, one JSON line per request):
+
+```json
+{ "id": "uuid", "method": "health | rank", "params": { ... } }
+```
+
+**Response** (Python → NestJS, one JSON line per response):
+
+```json
+{ "id": "uuid", "result": { ... } }
+{ "id": "uuid", "error": "message" }
+```
+
+**Ready signal** (written once at startup, before the request loop):
+
+```json
+{ "type": "ready", "model": "clip-ViT-B-32" }
+```
+
 ## Technical Notes
 
-- Use `sentence-transformers` or `transformers` + `torch` for CLIP encoding
+- Use `sentence-transformers` for CLIP encoding
 - Use `Pillow` for image I/O (needed in IR-02)
 - No GPU required; CPU-only runtime
-- Service lives in `apps/clip-service/` (or equivalent path in the repo)
-- Load model inside a `lifespan` handler so startup failure is visible immediately
+- Script lives at `apps/clip-service/clip_worker.py`
+- NestJS spawns it via `ClipProcessService` (see IR-01 NestJS side)
+- `CLIP_WORKER_PATH` env var tells NestJS where the script is

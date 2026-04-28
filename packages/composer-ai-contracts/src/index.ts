@@ -1,4 +1,15 @@
 export { contract } from './contract';
+export {
+  rankImagesDtoSchema,
+  rankImagesResponseSchema,
+  rankImagesErrorSchema,
+  rankedImageDtoSchema,
+  imagesHealthOkSchema,
+  imagesHealthDegradedSchema,
+  type RankImagesDto,
+  type RankedImageDto,
+  type RankImagesResponse,
+} from './dtos/images.dto';
 export { healthDtoSchema, type HealthDto } from './dtos/health.dto';
 export {
   todoDtoSchema,
