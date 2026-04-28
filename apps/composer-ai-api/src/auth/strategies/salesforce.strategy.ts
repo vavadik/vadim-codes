@@ -27,6 +27,7 @@ export class SalesforceStrategy extends PassportStrategy(Strategy, 'salesforce')
     _profile: unknown,
     done: (err: Error | null, user?: SfUser) => void
   ): Promise<void> {
+    console.log('accessToken', accessToken);
     const response = await fetch(`${this.instanceUrl}/services/oauth2/userinfo`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });

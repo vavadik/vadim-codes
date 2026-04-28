@@ -10,7 +10,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const document = await generateOpenApiDocument();
-  SwaggerModule.setup('swagger', app, document);
+  document.servers = [{ url: '/api' }];
+  SwaggerModule.setup('api/swagger', app, document, {
+    jsonDocumentUrl: 'api/swagger.json',
+  });
 
   await app.listen(process.env.COMPOSER_AI_API_PORT ?? 3000);
 }
