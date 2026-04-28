@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import sys
@@ -5,7 +6,6 @@ import time
 from io import BytesIO
 
 import numpy as np
-import requests
 from PIL import Image
 from sentence_transformers import SentenceTransformer
 
@@ -17,39 +17,25 @@ sys.stdout.write(json.dumps({"type": "ready", "model": MODEL_NAME}) + "\n")
 sys.stdout.flush()
 
 
-def fetch_and_preprocess(url: str) -> Image.Image:
-    resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
-    img = Image.open(BytesIO(resp.content)).convert("RGB")
-    w, h = img.size
-    if w <= h:
-        new_w, new_h = 256, int(h * 256 / w)
-    else:
-        new_w, new_h = int(w * 256 / h), 256
-    return img.resize((new_w, new_h), Image.LANCZOS)
-
-
 def handle_rank(req_id: str, params: dict) -> dict:
     prompt = params["prompt"]
-    image_urls = params["images"]
+    image_entries = params["images"]
     start = time.monotonic()
 
-    images = []
-    for url in image_urls:
-        try:
-            images.append(fetch_and_preprocess(url))
-        except Exception:
-            return {"id": req_id, "error": f"IMAGE_FETCH_FAILED: {url}"}
+    images = [
+        Image.open(BytesIO(base64.b64decode(entry["data"]))).convert("RGB")
+        for entry in image_entries
+    ]
 
     text_emb = model.encode([prompt])[0]
     img_embs = model.encode(images)
 
     text_norm = text_emb / np.linalg.norm(text_emb)
     results = []
-    for url, img_emb in zip(image_urls, img_embs):
+    for entry, img_emb in zip(image_entries, img_embs):
         img_norm = img_emb / np.linalg.norm(img_emb)
         score = float(np.clip(np.dot(text_norm, img_norm), 0.0, 1.0))
-        results.append({"url": url, "score": score})
+        results.append({"key": entry["key"], "score": score})
 
     results.sort(key=lambda r: r["score"], reverse=True)
 
@@ -60,9 +46,9 @@ def handle_rank(req_id: str, params: dict) -> dict:
             "results": results,
             "meta": {
                 "prompt": prompt,
-                "total": len(image_urls),
+                "total": len(image_entries),
                 "cached": 0,
-                "encoded": len(image_urls),
+                "encoded": len(image_entries),
                 "duration_ms": duration_ms,
             },
         },

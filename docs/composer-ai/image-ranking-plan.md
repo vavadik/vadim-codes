@@ -29,9 +29,9 @@ After this phase: the Python worker can accept a `rank` IPC request, download an
 
 After this phase: repeated requests for the same images skip re-encoding; cache hit latency drops below 200ms for 12 images.
 
-| #     | Story                                               | Estimate | Status | Notes |
-| ----- | --------------------------------------------------- | -------- | ------ | ----- |
-| IR-03 | [Embedding Cache](stories/IR-03-embedding-cache.md) | S        | ⬜     |       |
+| #     | Story                                               | Estimate | Status | Notes                                      |
+| ----- | --------------------------------------------------- | -------- | ------ | ------------------------------------------ |
+| IR-03 | [Embedding Cache](stories/IR-03-embedding-cache.md) | S        | ❌     | Superseded by IR-07 (Node-side blob cache) |
 
 ---
 
@@ -46,19 +46,36 @@ After this phase: `POST /images/rank` is fully wired end-to-end and NestJS expos
 
 ---
 
+## Phase 4 — Node-Side Preprocessing
+
+After this phase: image download, conversion, and resizing happen in Node.js using Sharp; the Python worker receives base64 JPEGs and returns only ranking scores; preprocessed images are cached in a filesystem blob store.
+
+| #     | Story                                                                             | Estimate | Status | Notes |
+| ----- | --------------------------------------------------------------------------------- | -------- | ------ | ----- |
+| IR-07 | [BlobStore: Abstraction & Filesystem Implementation](stories/IR-07-blob-store.md) | S        | ✅     |       |
+| IR-08 | [Image Preprocessing Service](stories/IR-08-image-preprocessing.md)               | S        | ✅     |       |
+| IR-09 | [Python Worker: Accept Base64 Input](stories/IR-09-clip-worker-base64.md)         | S        | ✅     |       |
+| IR-10 | [NestJS: Rank Flow Update](stories/IR-10-rank-flow-update.md)                     | S        | ✅     |       |
+
+---
+
 ## Dependency Graph
 
 ```
-IR-01 ──▶ IR-02 ──▶ IR-03 ──┐
-                              ├──▶ IR-05 ──▶ IR-06
-IR-04 ───────────────────────┘
+IR-01 ──▶ IR-02 ──▶ IR-05 ──▶ IR-06
+IR-04 ─────────────────┘
+
+IR-07 ──▶ IR-08 ──┐
+                   ├──▶ IR-10
+IR-09 ─────────────┘
 ```
 
 Key rules:
 
 - **IR-01** and **IR-04** have no prerequisites — start both in parallel.
-- **IR-02** (ranking) is the riskiest story; complete it early to surface any CPU performance concerns before the cache story.
-- **IR-05** (NestJS integration) is blocked until both IR-03 and IR-04 are done.
+- **IR-02** (ranking) is the riskiest story; complete it early to surface any CPU performance concerns.
+- **IR-07** and **IR-09** have no prerequisites within Phase 4 — start both in parallel.
+- **IR-10** is blocked until both IR-08 and IR-09 are done.
 
 ---
 

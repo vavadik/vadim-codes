@@ -42,3 +42,6 @@ scripts/.select-run-state.json
 # Python
 .venv/
 .hf_cache/
+
+# Blob store temp directory
+.tmp/

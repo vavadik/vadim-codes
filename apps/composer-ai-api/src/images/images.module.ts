@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '../auth/auth.module';
-import { ClipModule } from '../clip/clip.module';
-import { ImagesController } from './images.controller';
-import { ImagesService } from './images.service';
+import { AuthModule } from '../auth/auth.module.js';
+import { ClipModule } from '../clip/clip.module.js';
+import { ImagePreprocessModule } from '../image-preprocess/image-preprocess.module.js';
+import { ImagesController } from './images.controller.js';
+import { ImagesService } from './images.service.js';
 
 @Module({
-  imports: [AuthModule, ClipModule],
+  imports: [AuthModule, ClipModule, ImagePreprocessModule],
   controllers: [ImagesController],
   providers: [ImagesService],
 })
