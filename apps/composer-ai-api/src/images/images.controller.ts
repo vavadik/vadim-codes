@@ -1,7 +1,6 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { TsRestHandler, tsRestHandler } from '@ts-rest/nest';
 import { contract } from '@vadim-codes/composer-ai-contracts';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesService } from './images.service';
 
 @Controller()
@@ -25,7 +24,6 @@ export class ImagesController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
   @TsRestHandler(contract.images.rank)
   rank() {
     return tsRestHandler(contract.images.rank, async ({ body }) => {

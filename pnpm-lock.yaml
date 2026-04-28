@@ -236,6 +236,8 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(typescript@6.0.2)
 
+  apps/clip-service: {}
+
   apps/composer-ai-api:
     dependencies:
       '@nestjs/common':

@@ -2,4 +2,9 @@
 name = "clip-service"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["sentence-transformers>=3.3.0", "Pillow>=11.0.0"]
+dependencies = [
+  "sentence-transformers>=3.3.0",
+  "Pillow>=11.0.0",
+  "requests>=2.32.0",
+  "numpy>=1.26.0",
+]

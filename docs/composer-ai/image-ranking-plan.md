@@ -21,7 +21,7 @@ After this phase: the Python worker can accept a `rank` IPC request, download an
 
 | #     | Story                                                                       | Estimate | Status | Notes |
 | ----- | --------------------------------------------------------------------------- | -------- | ------ | ----- |
-| IR-02 | [Python CLIP Worker: Ranking Method](stories/IR-02-clip-service-ranking.md) | M        | ⬜     |       |
+| IR-02 | [Python CLIP Worker: Ranking Method](stories/IR-02-clip-service-ranking.md) | M        | ✅     |       |
 
 ---
 
@@ -41,8 +41,8 @@ After this phase: `POST /images/rank` is fully wired end-to-end and NestJS expos
 
 | #     | Story                                                                       | Estimate | Status | Notes |
 | ----- | --------------------------------------------------------------------------- | -------- | ------ | ----- |
-| IR-05 | [NestJS: CLIP Worker Integration](stories/IR-05-nestjs-clip-integration.md) | M        | ⬜     |       |
-| IR-06 | [Health Checks](stories/IR-06-health-checks.md)                             | XS       | ⬜     |       |
+| IR-05 | [NestJS: CLIP Worker Integration](stories/IR-05-nestjs-clip-integration.md) | M        | ✅     |       |
+| IR-06 | [Health Checks](stories/IR-06-health-checks.md)                             | XS       | ✅     |       |
 
 ---
 
