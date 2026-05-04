@@ -3,10 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import { useEditor } from '@/composables/useEditor';
 import { useTheme } from '@/composables/useTheme';
-import { ref } from 'vue';
+
+const props = defineProps<{ onSave?: (code: string) => void }>();
 
 const containerRef = ref<HTMLElement | null>(null);
 
@@ -15,7 +16,7 @@ const { theme } = useTheme();
 
 onMounted(async () => {
   if (containerRef.value) {
-    await mount(containerRef.value);
+    await mount(containerRef.value, props.onSave);
   }
 });
 

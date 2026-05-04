@@ -47,10 +47,10 @@ After this phase: users can run JavaScript in the browser, see console output, s
 | #     | Story                                                                             | Estimate | Status | Notes |
 | ----- | --------------------------------------------------------------------------------- | -------- | ------ | ----- |
 | CS-07 | [Web Worker execution sandbox](stories/CS-07-execution-sandbox.md)                | L        | ✅     |       |
-| CS-08 | [Execution timeout + elapsed timer](stories/CS-08-execution-timeout-and-timer.md) | S        | ⬜     |       |
-| CS-09 | [Cancel execution](stories/CS-09-cancel-execution.md)                             | XS       | ⬜     |       |
-| CS-10 | [Console output panel](stories/CS-10-console-output-panel.md)                     | M        | ⬜     |       |
-| CS-11 | [Runtime error display (gutter + Errors tab)](stories/CS-11-runtime-errors.md)    | M        | ⬜     |       |
+| CS-08 | [Execution timeout + elapsed timer](stories/CS-08-execution-timeout-and-timer.md) | S        | ✅     |       |
+| CS-09 | [Cancel execution](stories/CS-09-cancel-execution.md)                             | XS       | ✅     |       |
+| CS-10 | [Console output panel](stories/CS-10-console-output-panel.md)                     | M        | ✅     |       |
+| CS-11 | [Runtime error display (gutter + Errors tab)](stories/CS-11-runtime-errors.md)    | M        | ✅     |       |
 
 ---
 
@@ -60,8 +60,8 @@ After this phase: the full snippet lifecycle is working — save, share, open, f
 
 | #     | Story                                                                              | Estimate | Status | Notes |
 | ----- | ---------------------------------------------------------------------------------- | -------- | ------ | ----- |
-| CS-12 | [Save snippet + shareable link](stories/CS-12-save-snippet.md)                     | M        | ⬜     |       |
-| CS-13 | [Open shared snippet](stories/CS-13-open-shared-snippet.md)                        | S        | ⬜     |       |
+| CS-12 | [Save snippet + shareable link](stories/CS-12-save-snippet.md)                     | M        | ✅     |       |
+| CS-13 | [Open shared snippet](stories/CS-13-open-shared-snippet.md)                        | S        | ✅     |       |
 | CS-14 | [Fork a snippet](stories/CS-14-fork.md)                                            | S        | ⬜     |       |
 | CS-15 | [Anonymous account nudge](stories/CS-15-anonymous-account-nudge.md)                | XS       | ⬜     |       |
 | CS-16 | [Authenticated snippet list](stories/CS-16-snippet-list.md)                        | M        | ⬜     |       |

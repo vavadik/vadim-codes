@@ -1,9 +1,10 @@
 import { ref } from 'vue';
+import { clearMarkers } from './useEditor';
 
 export type ConsoleMessage = {
   type: 'console';
-  level: 'log' | 'warn' | 'error' | 'info';
-  args: unknown[];
+  level: 'log' | 'warn' | 'error' | 'info' | 'system';
+  args: string[];
   timestamp: number;
 };
 
@@ -15,19 +16,53 @@ export type ErrorMessage = {
   colNumber?: number;
 };
 
-type WorkerMessage = ConsoleMessage | ErrorMessage | { type: 'done' };
+type WorkerMessage =
+  | (Omit<ConsoleMessage, 'level'> & { level: 'log' | 'warn' | 'error' | 'info' })
+  | ErrorMessage
+  | { type: 'alert'; text: string }
+  | { type: 'done' };
+
+const TIMEOUT_MS = parseInt(import.meta.env['VITE_EXECUTION_TIMEOUT_MS'] ?? '10000', 10);
 
 // Module-level state so all consumers share the same execution context.
 const isRunning = ref(false);
 const messages = ref<ConsoleMessage[]>([]);
 const errors = ref<ErrorMessage[]>([]);
+export const elapsedMs = ref<number | null>(null);
 
 let activeWorker: Worker | null = null;
+let startTime: number | null = null;
+let elapsedInterval: ReturnType<typeof setInterval> | null = null;
+let timeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
-function cleanup(): void {
+function systemMsg(text: string): ConsoleMessage {
+  return { type: 'console', level: 'system', args: [text], timestamp: Date.now() };
+}
+
+type CleanupReason = 'done' | 'stopped' | 'timeout';
+
+function cleanup(reason: CleanupReason = 'done'): void {
+  if (elapsedInterval !== null) {
+    clearInterval(elapsedInterval);
+    elapsedInterval = null;
+  }
+  if (timeoutTimer !== null) {
+    clearTimeout(timeoutTimer);
+    timeoutTimer = null;
+  }
+  if (startTime !== null) {
+    elapsedMs.value = Date.now() - startTime;
+    startTime = null;
+  }
   activeWorker?.terminate();
   activeWorker = null;
   isRunning.value = false;
+
+  if (reason === 'stopped') {
+    messages.value.push(systemMsg('Execution stopped by user.'));
+  } else if (reason === 'timeout') {
+    messages.value.push(systemMsg(`Execution timed out after ${TIMEOUT_MS / 1000}s.`));
+  }
 }
 
 export function useExecution() {
@@ -38,7 +73,21 @@ export function useExecution() {
 
     messages.value = [];
     errors.value = [];
+    clearMarkers();
     isRunning.value = true;
+
+    startTime = Date.now();
+    elapsedMs.value = 0;
+
+    elapsedInterval = setInterval(() => {
+      if (startTime !== null) {
+        elapsedMs.value = Date.now() - startTime;
+      }
+    }, 100);
+
+    timeoutTimer = setTimeout(() => {
+      cleanup('timeout');
+    }, TIMEOUT_MS);
 
     const worker = new Worker(new URL('../workers/sandbox.worker.ts', import.meta.url), {
       type: 'module',
@@ -47,13 +96,26 @@ export function useExecution() {
 
     worker.onmessage = (e: MessageEvent<WorkerMessage>): void => {
       const msg = e.data;
-      console.log('msg', msg);
       if (msg.type === 'console') {
-        messages.value.push(msg);
+        messages.value.push(msg as ConsoleMessage);
       } else if (msg.type === 'error') {
         errors.value.push(msg);
+        // Echo to console so the error appears in timeline order.
+        messages.value.push({
+          type: 'console',
+          level: 'error',
+          args: [msg.message],
+          timestamp: Date.now(),
+        });
+      } else if (msg.type === 'alert') {
+        messages.value.push({
+          type: 'console',
+          level: 'log',
+          args: [`[Alert] ${msg.text}`],
+          timestamp: Date.now(),
+        });
       } else if (msg.type === 'done') {
-        cleanup();
+        cleanup('done');
       }
     };
 
@@ -65,15 +127,15 @@ export function useExecution() {
         lineNumber: e.lineno,
         colNumber: e.colno,
       });
-      cleanup();
+      cleanup('done');
     };
 
     worker.postMessage({ type: 'run', code });
   }
 
   function stop(): void {
-    cleanup();
+    cleanup('stopped');
   }
 
-  return { run, stop, isRunning, messages, errors };
+  return { run, stop, isRunning, messages, errors, elapsedMs };
 }
