@@ -31,13 +31,51 @@
             />
           </svg>
         </button>
+
+        <div class="app-layout__pref">
+          <span class="app-layout__pref-label">Font</span>
+          <div class="app-layout__stepper">
+            <button
+              :disabled="fontSize <= 10"
+              aria-label="Decrease font size"
+              @click="fontSize = Math.max(10, fontSize - 1)"
+            >
+              −
+            </button>
+            <span>{{ fontSize }}</span>
+            <button
+              :disabled="fontSize >= 24"
+              aria-label="Increase font size"
+              @click="fontSize = Math.min(24, fontSize + 1)"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div class="app-layout__pref">
+          <span class="app-layout__pref-label">Tab</span>
+          <div class="app-layout__tab-toggle">
+            <button :class="{ 'is-active': tabSize === 2 }" @click="tabSize = 2">2</button>
+            <button :class="{ 'is-active': tabSize === 4 }" @click="tabSize = 4">4</button>
+          </div>
+        </div>
       </div>
     </aside>
 
     <!-- Center Pane -->
     <main class="app-layout__center">
       <div class="app-layout__toolbar">
-        <!-- Run, Stop, Fork/Save, elapsed timer — populated in CS-07/CS-08/CS-09/CS-12 -->
+        <button class="app-layout__run-btn" :disabled="isRunning" @click="run(editorValue)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <path d="M2 1.5v9L10 6 2 1.5z" />
+          </svg>
+          Run
+        </button>
+        <!-- Stop, Fork/Save, elapsed timer — populated in CS-08/CS-09/CS-12 -->
+        <Transition name="draft-saved">
+          <span v-if="draftSaved" class="app-layout__draft-saved">Draft saved</span>
+        </Transition>
       </div>
       <div class="app-layout__editor">
         <MonacoEditor />
@@ -96,12 +134,17 @@ import { ref } from 'vue';
 import { useTheme } from '@/composables/useTheme';
 import { useAuth } from '@/composables/useAuth';
 import { usePopup } from '@/composables/usePopup';
+import { useEditorPrefs } from '@/composables/useEditorPrefs';
+import { draftSaved, value as editorValue } from '@/composables/useEditor';
+import { useExecution } from '@/composables/useExecution';
 import MonacoEditor from '@/components/editor/MonacoEditor.vue';
 import SignInPopup from '@/components/auth/SignInPopup.vue';
 
 const { theme, toggleTheme } = useTheme();
 const { user, isAuthenticated, signIn, signOut } = useAuth();
 const { open } = usePopup();
+const { fontSize, tabSize } = useEditorPrefs();
+const { run, isRunning } = useExecution();
 const activeTab = ref<'console' | 'errors'>('console');
 
 async function handleAuthBtn(): Promise<void> {
@@ -138,11 +181,12 @@ async function handleAuthBtn(): Promise<void> {
   }
 
   &__settings {
-    padding: 12px;
+    padding: 10px 12px;
     border-top: 1px solid var(--color-base-300);
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   &__theme-btn {
@@ -165,6 +209,132 @@ async function handleAuthBtn(): Promise<void> {
       opacity: 1;
       background: var(--color-base-200);
     }
+  }
+
+  &__pref {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__pref-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: color-mix(in oklch, var(--color-base-content) 50%, transparent);
+    user-select: none;
+  }
+
+  &__stepper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid var(--color-base-300);
+    border-radius: 5px;
+    overflow: hidden;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 22px;
+      border: none;
+      background: transparent;
+      color: var(--color-base-content);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.1s;
+
+      &:hover:not(:disabled) {
+        background: var(--color-base-200);
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+    }
+
+    span {
+      font-size: 11px;
+      font-weight: 500;
+      min-width: 22px;
+      text-align: center;
+      user-select: none;
+    }
+  }
+
+  &__tab-toggle {
+    display: flex;
+    border: 1px solid var(--color-base-300);
+    border-radius: 5px;
+    overflow: hidden;
+
+    button {
+      padding: 2px 7px;
+      height: 22px;
+      border: none;
+      background: transparent;
+      color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition:
+        background 0.1s,
+        color 0.1s;
+
+      &:hover:not(.is-active) {
+        background: var(--color-base-200);
+        color: var(--color-base-content);
+      }
+
+      &.is-active {
+        background: var(--color-accent);
+        color: var(--color-accent-content);
+      }
+    }
+  }
+
+  &__run-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-accent-content);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) {
+      background: var(--color-accent-hover);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+
+  &__draft-saved {
+    margin-left: auto;
+    font-size: 11px;
+    color: color-mix(in oklch, var(--color-base-content) 45%, transparent);
+    user-select: none;
+  }
+
+  .draft-saved-enter-active,
+  .draft-saved-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .draft-saved-enter-from,
+  .draft-saved-leave-to {
+    opacity: 0;
   }
 
   &__user-panel {

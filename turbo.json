@@ -89,7 +89,16 @@
     },
     "sandbox-api#dev": {
       "dependsOn": ["@vadim-codes/sandbox-contracts#build", "@vadim-codes/sandbox-db#build"],
-      "env": ["SANDBOX_API_PORT", "SANDBOX_DB_NAME"],
+      "env": [
+        "SANDBOX_API_PORT",
+        "SANDBOX_DB_NAME",
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "GITHUB_CALLBACK_URL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_CALLBACK_URL"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -101,6 +110,10 @@
     },
     "test": {
       "dependsOn": ["^test"],
+      "cache": false
+    },
+    "migrate": {
+      "dependsOn": ["^migrate"],
       "cache": false
     }
   }

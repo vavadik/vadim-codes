@@ -35,8 +35,8 @@ After this phase: the editor feels complete — preferences are configurable, th
 
 | #     | Story                                                                            | Estimate | Status | Notes |
 | ----- | -------------------------------------------------------------------------------- | -------- | ------ | ----- |
-| CS-05 | [Editor preferences (font size, tab width)](stories/CS-05-editor-preferences.md) | S        | ⬜     |       |
-| CS-06 | [Draft auto-save to localStorage](stories/CS-06-draft-autosave.md)               | S        | ⬜     |       |
+| CS-05 | [Editor preferences (font size, tab width)](stories/CS-05-editor-preferences.md) | S        | ✅     |       |
+| CS-06 | [Draft auto-save to localStorage](stories/CS-06-draft-autosave.md)               | S        | ✅     |       |
 
 ---
 
@@ -46,7 +46,7 @@ After this phase: users can run JavaScript in the browser, see console output, s
 
 | #     | Story                                                                             | Estimate | Status | Notes |
 | ----- | --------------------------------------------------------------------------------- | -------- | ------ | ----- |
-| CS-07 | [Web Worker execution sandbox](stories/CS-07-execution-sandbox.md)                | L        | ⬜     |       |
+| CS-07 | [Web Worker execution sandbox](stories/CS-07-execution-sandbox.md)                | L        | ✅     |       |
 | CS-08 | [Execution timeout + elapsed timer](stories/CS-08-execution-timeout-and-timer.md) | S        | ⬜     |       |
 | CS-09 | [Cancel execution](stories/CS-09-cancel-execution.md)                             | XS       | ⬜     |       |
 | CS-10 | [Console output panel](stories/CS-10-console-output-panel.md)                     | M        | ⬜     |       |
